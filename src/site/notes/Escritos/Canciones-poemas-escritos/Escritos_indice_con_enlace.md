@@ -2,6 +2,10 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/escritos-indice-con-enlace/"}
 ---
 
+---
+dg-home: true
+dg-title: Índice de poemas
+---
 | Nº | Idioma  | Fecha de creación             | Título                                                                                                                       |
 | -- | ------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | \- | Spanish | 6:44 PM - September 15, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Siempre\|Siempre]]                                         |
