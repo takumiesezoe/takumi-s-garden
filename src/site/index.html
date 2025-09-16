@@ -139,7 +139,8 @@
       a.addEventListener("click",(ev)=>{ev.preventDefault();openNote(a.dataset.url);});
     });
   }
-
+  
+const ORDER_MODE = "index"; // "index" para respetar el orden del .md, "date" para ordenar por fecha
   async function main(){
     try{
       $status.textContent = "Leyendo índice…";
@@ -149,13 +150,17 @@
       $status.textContent = "Leyendo fechas de cada poema…";
       const enriched = await Promise.all(links.map(enrichWithDate));
 
-      // Orden: nuevo→viejo por fecha+hora; sin fecha al final por título
-      enriched.sort((a,b)=>{
-        if(a.date && b.date) return b.date - a.date;
-        if(a.date && !b.date) return -1;
-        if(!a.date && b.date) return 1;
-        return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
-      });
+     if (ORDER_MODE === "date") {
+  // nuevo→viejo por fecha+hora; sin fecha al final por título
+  enriched.sort((a,b)=>{
+    if(a.date && b.date) return b.date - a.date;
+    if(a.date && !b.date) return -1;
+    if(!a.date && b.date) return 1;
+    return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
+  });
+}
+// si ORDER_MODE === "index", NO tocamos el orden: se queda tal cual venga del .md
+
 
       renderList(enriched);
       $status.textContent = "✅ Cargado";
