@@ -4,6 +4,5 @@
 
 # Índice de poemas (portada)
 
-- [[Poema 1\|Poema 1]]
-- [[Poema 2\|Poema 2]]
-- [[Poema 3\|Poema 3]]
+- [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/¿Para que\|¿Para que]]]
+- [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/3 en ralla\|3 en ralla]]
