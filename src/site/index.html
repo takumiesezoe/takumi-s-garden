@@ -38,54 +38,85 @@
 </div></div>
 
 <script>
-  // Rutas
+  // Rutas (ajusta si cambias carpetas):
   const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
-  const baseFolder = "Escritos/Canciones-poemas-escritos";
+  const baseFolder = "Escritos/Canciones-poemas-escritos"; // carpeta donde viven tus poemas .md
 
   const $status=document.getElementById("status"),$list=document.getElementById("lista"),
         $count=document.getElementById("count"),$q=document.getElementById("q"),
         $viewer=document.getElementById("viewer"),$note=document.getElementById("note"),
         $back=document.getElementById("back");
 
-  // === fechas
-  const meses = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12,
-                 january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+  // ===== Fechas (ajustada a "6:44 p. m. - septiembre 15, 2025") =====
+  const meses = {
+    'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,
+    'julio':7,'agosto':8,'septiembre':9,'setiembre':9,'octubre':10,
+    'noviembre':11,'diciembre':12,
+    'january':1,'february':2,'march':3,'april':4,'may':5,'june':6,
+    'july':7,'august':8,'september':9,'october':10,'november':11,'december':12
+  };
 
   function parseDate(raw){
     if(!raw) return null;
     let s = String(raw).trim();
-    s = s.replace(/^\s*\d{1,2}:\d{2}\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*/i,"");
-    s = s.replace(/^\s*[-–—]\s*/,"").trim();
+
+    // Quitar hora al inicio: "6:44 p. m. - " / "11:08 a. m. - " / "6:44 PM - "
+    s = s.replace(/^\s*\d{1,2}:\d{2}\s*(?:a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*/i, "").trim();
+
     let m;
-    if(m = s.match(/^([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i)){ // septiembre 15, 2025
-      const mes=m[1].toLowerCase(), D=+m[2], Y=+m[3]; const M=meses[mes]; if(M) return new Date(Y,M-1,D);
+
+    // Caso: "septiembre 15, 2025" (o mes en EN)
+    if(m = s.match(/^([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i)){
+      const mes = m[1].toLowerCase(), D = +m[2], Y = +m[3];
+      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
     }
-    if(m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i)){ // 15 de septiembre de 2025
-      const D=+m[1], mes=m[2].toLowerCase(), Y=+m[3]; const M=meses[mes]; if(M) return new Date(Y,M-1,D);
+
+    // Caso: "15 de septiembre de 2025"
+    if(m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i)){
+      const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
+      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
     }
-    if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){ // 15 septiembre 2025
-      const D=+m[1], mes=m[2].toLowerCase(), Y=+m[3]; const M=meses[mes]; if(M) return new Date(Y,M-1,D);
+
+    // Caso: "15 septiembre 2025"
+    if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){
+      const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
+      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
     }
-    if(m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)){ // 15/09/2025
+
+    // Caso: "15/09/2025"
+    if(m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)){
       return new Date(+m[3],+m[2]-1,+m[1]);
     }
+
     return null;
   }
 
-  function formatDate(d){ if(!d) return ""; const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic']; return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`; }
+  function formatDate(d){ 
+    if(!d) return ""; 
+    const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic']; 
+    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`; 
+  }
+
   function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
-  function targetToPath(t){ const clean=t.replace(/^notes\//,'').replace(/^\//,''); const withFolder=clean.includes('/')?clean:`${baseFolder}/${clean}`; return `notes/${withFolder.replace(/\.md$/i,'')}.md`; }
+  function targetToPath(t){
+    const clean=t.replace(/^notes\//,'').replace(/^\//,'');
+    const withFolder=clean.includes('/')?clean:`${baseFolder}/${clean}`;
+    return `notes/${withFolder.replace(/\.md$/i,'')}.md`;
+  }
 
   fetch(encodeURI(mdPath))
   .then(async res=>{
     if(!res.ok) throw new Error("HTTP "+res.status);
     let md=await res.text();
+    // Limpia frontmatter/JSON si los hubiera
     md=md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
     const lines=md.split(/\r?\n/);
 
-    // detectar cabecera de tabla
+    // Detectar cabecera de tabla (línea con | y separadores --- debajo)
     let headerIdx=-1,dateCol=-1,linkCol=-1;
-    for(let i=0;i<lines.length;i++){ if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){ headerIdx=i; break; } }
+    for(let i=0;i<lines.length;i++){
+      if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){ headerIdx=i; break; }
+    }
     if(headerIdx>=0){
       const headers=lines[headerIdx].split('|').map(c=>c.trim().toLowerCase());
       headers.forEach((h,idx)=>{ if(/fecha/.test(h)) dateCol=idx; if(/t[ií]tulo|title/.test(h)) linkCol=idx; });
@@ -95,25 +126,44 @@
     for(let i=(headerIdx>=0?headerIdx+2:0);i<lines.length;i++){
       if(!lines[i].includes('|')) continue;
       const cells=lines[i].split('|').map(c=>c.trim());
-      let linkCell=cells.find(c=>/\[\[.+\]\]/.test(c)); if(!linkCell) continue;
-      const m=linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/); if(!m) continue;
+      if(cells.length<2) continue;
+
+      // Celda con wikilink [[...]]
+      let linkCell = (linkCol>=0 && /\[\[.+\]\]/.test(cells[linkCol])) ? cells[linkCol] : cells.find(c=>/\[\[.+\]\]/.test(c));
+      if(!linkCell) continue;
+
+      const m = linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/);
+      if(!m) continue;
+
       const target=m[1].trim(), title=(m[2]||titleFromTarget(m[1])).trim();
-      const dateText=(dateCol>=0&&cells[dateCol])?cells[dateCol]:"";
+
+      let dateText = (dateCol>=0 && cells[dateCol]) ? cells[dateCol] : '';
+      if(!dateText){
+        // Por si la fecha está en otra celda de la fila
+        dateText = cells.find(c => /\d{4}|\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(c)) || '';
+      }
       const date=parseDate(dateText);
+
       rows.push({title,target,date});
     }
 
-    // fallback: todos los [[links]]
+    // Fallback: si no había tabla, extrae todos los [[enlaces]]
     if(rows.length===0){
       const seen=new Map(); const re=/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g; let m;
       while((m=re.exec(md))){ const tgt=m[1].trim(); const ttl=(m[2]||titleFromTarget(tgt)).trim(); seen.set(tgt,ttl); }
       for(const [tgt,ttl] of seen.entries()) rows.push({title:ttl,target:tgt,date:null});
     }
 
-    // ordenar nuevo → viejo
-    rows.sort((a,b)=>{ if(a.date&&b.date) return b.date-a.date; if(a.date&&!b.date) return -1; if(!a.date&&b.date) return 1; return a.title.localeCompare(b.title,"es",{sensitivity:"base"}); });
+    // Orden: nuevo → viejo; sin fecha al final por orden alfabético
+    rows.sort((a,b)=>{
+      if(a.date && b.date) return b.date - a.date;
+      if(a.date && !b.date) return -1;
+      if(!a.date && b.date) return 1;
+      return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
+    });
 
-    renderList(rows); $status.textContent = rows.length ? "✅ Cargado" : "⚠️ Vacío";
+    renderList(rows);
+    $status.textContent = rows.length ? "✅ Cargado" : "⚠️ Índice vacío";
     $q.addEventListener("input",()=>{const q=$q.value.toLowerCase();renderList(rows.filter(r=>r.title.toLowerCase().includes(q)));});
   })
   .catch(err=>{$status.textContent="❌ "+err.message});
@@ -125,6 +175,7 @@
       return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a> ${d}</li>`;
     }).join("");
     $count.textContent=items.length;
+    // Abrir nota dentro de la página (sin 404)
     $list.querySelectorAll("a").forEach(a=>{
       a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
     });
