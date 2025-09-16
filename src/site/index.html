@@ -30,11 +30,13 @@
   ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   .item a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
   .item a:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
-  .meta{font-size:12px;color:var(--muted)}
   .viewer{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
   .small{font-size:12px;color:var(--muted)}
   hr{border:none;border-top:1px solid var(--line);margin:14px 0}
+  details{margin-top:10px}
+  summary{cursor:pointer;color:#f6b3cf}
+  .err{color:#ff8aa8}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -50,19 +52,22 @@
     </div>
 
     <p class="small">Índice encontrado en: <code id="chosenPath">—</code></p>
-    <p class="small">Carpeta base de poemas: <code id="baseFolderShow">—</code></p>
+    <p class="small">Carpeta base detectada: <code id="baseFolderShow">—</code></p>
 
     <ul id="lista" class="list"></ul>
 
     <div id="viewer" class="viewer" hidden>
       <a href="#" id="back" class="back">← Volver al índice</a>
       <div id="note"></div>
+      <details id="dbg" hidden>
+        <summary>Ver URLs probadas</summary>
+        <div id="tried"></div>
+      </details>
     </div>
   </div>
 </div>
 
 <script>
-  // ====== Auto-detección del índice ======
   const $status = document.getElementById("status");
   const $lista  = document.getElementById("lista");
   const $viewer = document.getElementById("viewer");
@@ -72,8 +77,10 @@
   const $chosen = document.getElementById("chosenPath");
   const $baseShow = document.getElementById("baseFolderShow");
   const $back   = document.getElementById("back");
+  const $dbg    = document.getElementById("dbg");
+  const $tried  = document.getElementById("tried");
 
-  // Candidatos: incluye tu estructura con "Canciones-poemas-escritos/Canciones poemas escritos/indice pagina web.md"
+  // === Candidatos de índice (incluye tu estructura larga)
   const fileNames = [
     "indice pagina web.md","Indice pagina web.md","índice pagina web.md","Índice pagina web.md",
     "Escritos_indice_con_enlace.md","index.md","Indice.md"
@@ -88,97 +95,153 @@
   ];
   const candidates=[]; for (const f of folders){ for(const n of fileNames){ candidates.push(`${f}/${n}`); } }
 
+  // Utils
   function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
   function titleFromTarget(t){return decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));}
-  function deduceBaseFolder(mdPath){
-    // mdPath = "notes/<carpetas>/archivo.md" → devolvemos "<carpetas>" sin "notes/"
-    const p = mdPath.split("/"); p.pop(); return p.slice(1).join("/");
-  }
-  function targetToPath(baseFolder, target){
-    const clean = target.replace(/^notes\//,'').replace(/^\//,'');
-    const withFolder = clean.includes('/') ? clean : `${baseFolder}/${clean}`;
-    return `notes/${withFolder.replace(/\.md$/i,'')}.md`;
-  }
-  async function tryFetch(url){
-    try{ const r = await fetch(encodeURI(url)); if(!r.ok) return null; return await r.text(); }
-    catch{ return null; }
-  }
+  const rmAccents = s => s.normalize('NFD').replace(/\p{Diacritic}+/gu,'');
+  const stripPunct = s => s.replace(/[¿?¡!:"“”‘’'`.,;()/\\]+/g,'');
+  function deduceBaseFolder(mdPath){ const p=mdPath.split("/"); p.pop(); return p.slice(1).join("/"); } // sin "notes/"
+  async function tryFetch(url){ try{ const r=await fetch(encodeURI(url)); if(!r.ok) return null; return await r.text(); }catch{ return null; } }
+
   async function findIndex(){
-    for(const p of candidates){
-      const t = await tryFetch(p);
-      if(t!==null) return {path:p,text:t};
-    }
+    for(const p of candidates){ const t = await tryFetch(p); if(t!==null) return {path:p,text:t}; }
     return null;
   }
+
   function extractLinks(md){
-    // limpia frontmatter/JSON si existiera
     md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-    // 1) líneas con viñetas "- [[Titulo]]"
     const bullet = [...md.matchAll(/^\s*[-*+]\s+\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/mg)];
-    if(bullet.length){
-      return bullet.map(m=>({target:m[1].trim(), title:(m[2]||titleFromTarget(m[1])).trim()}));
-    }
-    // 2) si no hay viñetas, coge todos los [[links]]
+    if(bullet.length){ return bullet.map(m=>({target:m[1].trim(), title:(m[2]||titleFromTarget(m[1])).trim()})); }
     const all = [...md.matchAll(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g)];
     return all.map(m=>({target:m[1].trim(), title:(m[2]||titleFromTarget(m[1])).trim()}));
   }
 
   function renderList(items, baseFolder){
-    if(!items.length){
-      $status.innerHTML = "<span class='muted'>⚠️ No encontré [[links]] en el índice.</span>";
-      return;
-    }
+    if(!items.length){ $status.innerHTML = "<span class='muted'>⚠️ No encontré [[links]] en el índice.</span>"; return; }
     $status.textContent = "✅ Cargado";
     $count.textContent = items.length;
     $lista.innerHTML = items.map(it=>{
-      const url = encodeURI(targetToPath(baseFolder, it.target));
-      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(it.title)}</a></li>`;
+      const href = buildCandidates(baseFolder, it.target)[0]; // primera candidata, solo para data
+      return `<li class="item"><a href="#" data-target="${escapeHtml(it.target)}" data-base="${escapeHtml(baseFolder)}" data-hint="${escapeHtml(href)}">${escapeHtml(it.title)}</a></li>`;
     }).join("");
-    // listeners
     $lista.querySelectorAll("a").forEach(a=>{
       a.addEventListener("click", ev=>{
         ev.preventDefault();
-        openNote(a.dataset.url);
+        const base = a.dataset.base;
+        const target = a.dataset.target;
+        openNoteProbing(base, target);
       });
     });
-    // buscador
+    // búsqueda
     $q.oninput = ()=>{
       const q = $q.value.toLowerCase();
       const filtered = items.filter(x=>x.title.toLowerCase().includes(q));
       $count.textContent = filtered.length;
       $lista.innerHTML = filtered.map(it=>{
-        const url = encodeURI(targetToPath(baseFolder, it.target));
-        return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(it.title)}</a></li>`;
+        const href = buildCandidates(baseFolder, it.target)[0];
+        return `<li class="item"><a href="#" data-target="${escapeHtml(it.target)}" data-base="${escapeHtml(baseFolder)}" data-hint="${escapeHtml(href)}">${escapeHtml(it.title)}</a></li>`;
       }).join("");
       $lista.querySelectorAll("a").forEach(a=>{
         a.addEventListener("click", ev=>{
           ev.preventDefault();
-          openNote(a.dataset.url);
+          openNoteProbing(a.dataset.base, a.dataset.target);
         });
       });
     };
   }
 
-  function openNote(url){
-    $viewer.hidden = false;
-    $note.innerHTML = "<p class='muted'>Cargando poema…</p>";
-    fetch(url)
-      .then(r=>{ if(!r.ok) throw new Error(`No se pudo abrir ${url} (${r.status})`); return r.text(); })
-      .then(md=>{ $note.innerHTML = marked.parse(md); $note.scrollIntoView({behavior:"smooth"}); })
-      .catch(e=>{ $note.innerHTML = `<p style="color:#ff8aa8">❌ ${escapeHtml(String(e))}</p><p><code>${url}</code></p>`; });
+  // Genera múltiples URLs candidatas para un target
+  function buildCandidates(baseFolder, target){
+    // target puede venir con subcarpeta o con .md
+    const bare = target.replace(/\.md$/i,'');
+    const withMd = (x)=> `notes/${baseFolder}/${x}.md`;
+    const keepMd = (x)=> `notes/${baseFolder}/${x}`;
+
+    const variants = new Set();
+
+    // tal cual
+    variants.add(withMd(bare));
+    variants.add(keepMd(target));
+
+    // minúsculas
+    variants.add(withMd(bare.toLowerCase()));
+    variants.add(keepMd(target.toLowerCase()));
+
+    // sin acentos
+    const noAcc = rmAccents(bare);
+    variants.add(withMd(noAcc));
+    variants.add(withMd(noAcc.toLowerCase()));
+
+    // sin signos raros
+    const noPunct = stripPunct(bare);
+    variants.add(withMd(noPunct));
+    variants.add(withMd(noPunct.toLowerCase()));
+
+    // espacios → guiones y underscores
+    const hyph = noPunct.replace(/\s+/g,'-');
+    const unds = noPunct.replace(/\s+/g,'_');
+    variants.add(withMd(hyph));
+    variants.add(withMd(hyph.toLowerCase()));
+    variants.add(withMd(unds));
+    variants.add(withMd(unds.toLowerCase()));
+
+    // por si realmente están un nivel ARRIBA de la carpeta del índice
+    const parent = baseFolder.split('/').slice(0,-1).join('/');
+    if(parent){
+      variants.add(`notes/${parent}/${bare}.md`);
+      variants.add(`notes/${parent}/${bare.toLowerCase()}.md`);
+      variants.add(`notes/${parent}/${noAcc}.md`);
+      variants.add(`notes/${parent}/${noAcc.toLowerCase()}.md`);
+      variants.add(`notes/${parent}/${hyph}.md`);
+      variants.add(`notes/${parent}/${hyph.toLowerCase()}.md`);
+    }
+
+    return [...variants];
   }
 
-  // Arranque
+  async function openNoteProbing(baseFolder, target){
+    $viewer.hidden = false;
+    $note.innerHTML = "<p class='muted'>Buscando el poema…</p>";
+    $dbg.hidden = true; $tried.innerHTML = "";
+
+    const candidates = buildCandidates(baseFolder, target);
+    const tried = [];
+    for(const url of candidates){
+      tried.push(url);
+      try{
+        const res = await fetch(encodeURI(url));
+        if(res.ok){
+          const md = await res.text();
+          $note.innerHTML = marked.parse(md);
+          $note.scrollIntoView({behavior:"smooth"});
+          return;
+        }
+      }catch(_){}
+    }
+    // Si no se encontró, mostramos todas las URLs probadas para que ajustes el nombre exacto
+    $note.innerHTML = `<p class="err">❌ No pude abrir el poema <b>${escapeHtml(target)}</b>.</p><p class="muted">Revisa mayúsculas, acentos y signos del nombre del archivo en GitHub.</p>`;
+    $dbg.hidden = false;
+    $tried.innerHTML = "<ol>" + tried.map(u=>`<li><code>${escapeHtml(u)}</code></li>`).join("") + "</ol>";
+  }
+
+  // Arranque: auto-detectar índice, deducir carpeta base, listar links
   (async function main(){
-    $status.textContent = "🔎 Buscando índice en varias rutas…";
-    const found = await findIndex();
+    $status.textContent = "🔎 Buscando índice…";
+    const found = await (async ()=>{
+      for(const p of candidates){
+        const t = await tryFetch(p);
+        if(t!==null) return {path:p,text:t};
+      }
+      return null;
+    })();
     if(!found){
       $status.innerHTML = "❌ No encontré el archivo de índice en rutas comunes.<br><span class='small'>Crea o confirma un archivo como <code>indice pagina web.md</code> dentro de <code>src/site/notes/…</code>.</span>";
       return;
     }
     $chosen.textContent = found.path;
-    const baseFolder = deduceBaseFolder(found.path);
+    const baseFolder = deduceBaseFolder(found.path); // sin 'notes/'
     $baseShow.textContent = baseFolder;
+
     const links = extractLinks(found.text);
     renderList(links, baseFolder);
   })();
