@@ -56,49 +56,46 @@
   };
 
 <script>
-  function parseDate(raw){
-    if(!raw) return null;
-    let s = String(raw).trim();
+function parseDate(raw){
+  if(!raw) return null;
+  let s = String(raw).trim();
 
-    // quitar hora inicial tipo "6:44 p. m. - "
-    s = s.replace(/^\s*\d{1,2}:\d{2}\s*(?:a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*[-–—]\s*/i,"");
-    s = s.replace(/^\s*[-–—]\s*/,"").trim();
+  // quitar hora al inicio: "6:44 p. m. - "
+  s = s.replace(/^\s*\d{1,2}:\d{2}\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*/i, "");
+  s = s.trim();
 
-    const meses = {
-      'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,
-      'julio':7,'agosto':8,'septiembre':9,'setiembre':9,'octubre':10,
-      'noviembre':11,'diciembre':12,
-      'january':1,'february':2,'march':3,'april':4,'may':5,'june':6,
-      'july':7,'august':8,'september':9,'october':10,'november':11,'december':12
-    };
+  const meses = {
+    'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,
+    'julio':7,'agosto':8,'septiembre':9,'setiembre':9,'octubre':10,
+    'noviembre':11,'diciembre':12
+  };
 
-    let m;
+  let m;
 
-    // Caso: "septiembre 15, 2025"
-    if(m = s.match(/^([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i)){
-      const mes = m[1].toLowerCase(), D=+m[2], Y=+m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
-    }
-
-    // Caso: "15 de septiembre de 2025"
-    if(m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i)){
-      const D=+m[1], mes=m[2].toLowerCase(), Y=+m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
-    }
-
-    // Caso: "15 septiembre 2025"
-    if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){
-      const D=+m[1], mes=m[2].toLowerCase(), Y=+m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
-    }
-
-    // Fechas numéricas: dd/mm/yyyy
-    if(m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)){
-      return new Date(+m[3],+m[2]-1,+m[1]);
-    }
-
-    return null;
+  // "septiembre 15, 2025"
+  if(m = s.match(/^([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i)){
+    const mes = m[1].toLowerCase();
+    const D = +m[2], Y = +m[3];
+    const M = meses[mes];
+    if(M) return new Date(Y, M-1, D);
   }
+
+  // "15 de septiembre de 2025"
+  if(m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i)){
+    const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
+    const M = meses[mes];
+    if(M) return new Date(Y, M-1, D);
+  }
+
+  // "15 septiembre 2025"
+  if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){
+    const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
+    const M = meses[mes];
+    if(M) return new Date(Y, M-1, D);
+  }
+
+  return null;
+}
 </script>
 
   function formatDate(d){ if(!d) return ""; const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic']; return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`; }
