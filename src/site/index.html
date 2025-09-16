@@ -47,54 +47,50 @@
         $viewer=document.getElementById("viewer"),$note=document.getElementById("note"),
         $back=document.getElementById("back");
 
-  // ===== Fechas (ajustada a "6:44 p. m. - septiembre 15, 2025") =====
-  const meses = {
-    'enero':1,'febrero':2,'marzo':3,'abril':4,'mayo':5,'junio':6,
-    'julio':7,'agosto':8,'septiembre':9,'setiembre':9,'octubre':10,
-    'noviembre':11,'diciembre':12,
-    'january':1,'february':2,'march':3,'april':4,'may':5,'june':6,
-    'july':7,'august':8,'september':9,'october':10,'november':11,'december':12
-  };
-
+  // ===== Fechas (con hora y a. m./p. m.) =====
   function parseDate(raw){
     if(!raw) return null;
-    let s = String(raw).trim();
+    const s = String(raw).trim();
 
-    // Quitar hora al inicio: "6:44 p. m. - " / "11:08 a. m. - " / "6:44 PM - "
-    s = s.replace(/^\s*\d{1,2}:\d{2}\s*(?:a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*/i, "").trim();
-
-    let m;
-
-    // Caso: "septiembre 15, 2025" (o mes en EN)
-    if(m = s.match(/^([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i)){
-      const mes = m[1].toLowerCase(), D = +m[2], Y = +m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
+    // 1) "6:44 p. m. - septiembre 15, 2025"  (hora 12h + AM/PM con puntos + mes día, año)
+    let m = s.match(/^(\d{1,2}):(\d{2})\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i);
+    if(m){
+      let h = +m[1], mi = +m[2], ap = m[3].toLowerCase(), mesTxt = m[4].toLowerCase(), D = +m[5], Y = +m[6];
+      const meses = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12,
+                     january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+      const M = meses[mesTxt]; if(!M) return null;
+      if(/p/.test(ap) && h < 12) h += 12;
+      if(/a/.test(ap) && h === 12) h = 0;
+      return new Date(Y, M-1, D, h, mi);
     }
 
-    // Caso: "15 de septiembre de 2025"
-    if(m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i)){
-      const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
+    // 2) "15 de septiembre de 2025"
+    m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i);
+    if(m){
+      const D=+m[1], mesTxt=m[2].toLowerCase(), Y=+m[3];
+      const mesesES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+      const M=mesesES[mesTxt]; if(M) return new Date(Y,M-1,D);
     }
 
-    // Caso: "15 septiembre 2025"
-    if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){
-      const D = +m[1], mes = m[2].toLowerCase(), Y = +m[3];
-      const M = meses[mes]; if(M) return new Date(Y,M-1,D);
+    // 3) "15 septiembre 2025"
+    m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i);
+    if(m){
+      const D=+m[1], mesTxt=m[2].toLowerCase(), Y=+m[3];
+      const mesesES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+      const M=mesesES[mesTxt]; if(M) return new Date(Y,M-1,D);
     }
 
-    // Caso: "15/09/2025"
-    if(m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/)){
-      return new Date(+m[3],+m[2]-1,+m[1]);
-    }
+    // 4) "15/09/2025" o "15-09-2025"
+    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if(m) return new Date(+m[3], +m[2]-1, +m[1]);
 
     return null;
   }
 
-  function formatDate(d){ 
-    if(!d) return ""; 
-    const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic']; 
-    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`; 
+  function formatDate(d){
+    if(!d) return "";
+    const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
+    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`;
   }
 
   function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
@@ -108,11 +104,11 @@
   .then(async res=>{
     if(!res.ok) throw new Error("HTTP "+res.status);
     let md=await res.text();
-    // Limpia frontmatter/JSON si los hubiera
+    // limpia frontmatter/json si existieran
     md=md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
     const lines=md.split(/\r?\n/);
 
-    // Detectar cabecera de tabla (línea con | y separadores --- debajo)
+    // detectar cabecera de tabla
     let headerIdx=-1,dateCol=-1,linkCol=-1;
     for(let i=0;i<lines.length;i++){
       if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){ headerIdx=i; break; }
@@ -128,7 +124,7 @@
       const cells=lines[i].split('|').map(c=>c.trim());
       if(cells.length<2) continue;
 
-      // Celda con wikilink [[...]]
+      // celda con wikilink [[...]]
       let linkCell = (linkCol>=0 && /\[\[.+\]\]/.test(cells[linkCol])) ? cells[linkCol] : cells.find(c=>/\[\[.+\]\]/.test(c));
       if(!linkCell) continue;
 
@@ -139,7 +135,6 @@
 
       let dateText = (dateCol>=0 && cells[dateCol]) ? cells[dateCol] : '';
       if(!dateText){
-        // Por si la fecha está en otra celda de la fila
         dateText = cells.find(c => /\d{4}|\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(c)) || '';
       }
       const date=parseDate(dateText);
@@ -147,14 +142,14 @@
       rows.push({title,target,date});
     }
 
-    // Fallback: si no había tabla, extrae todos los [[enlaces]]
+    // fallback: si no hubo tabla, sacar todos los [[links]]
     if(rows.length===0){
       const seen=new Map(); const re=/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g; let m;
       while((m=re.exec(md))){ const tgt=m[1].trim(); const ttl=(m[2]||titleFromTarget(tgt)).trim(); seen.set(tgt,ttl); }
       for(const [tgt,ttl] of seen.entries()) rows.push({title:ttl,target:tgt,date:null});
     }
 
-    // Orden: nuevo → viejo; sin fecha al final por orden alfabético
+    // ordenar nuevo → viejo (si no hay fecha, al final por título)
     rows.sort((a,b)=>{
       if(a.date && b.date) return b.date - a.date;
       if(a.date && !b.date) return -1;
@@ -175,9 +170,9 @@
       return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a> ${d}</li>`;
     }).join("");
     $count.textContent=items.length;
-    // Abrir nota dentro de la página (sin 404)
+    // abrir nota dentro de la página
     $list.querySelectorAll("a").forEach(a=>{
-      a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
+      a.addEventListener("click",(ev)=>{ev.preventDefault();openNote(a.dataset.url);});
     });
   }
 
