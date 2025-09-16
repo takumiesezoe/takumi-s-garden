@@ -38,59 +38,51 @@
 </div></div>
 
 <script>
-  // Rutas (ajusta si cambias carpetas):
+  // RUTAS: ajusta si cambias carpetas
   const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
-  const baseFolder = "Escritos/Canciones-poemas-escritos"; // carpeta donde viven tus poemas .md
+  const baseFolder = "Escritos/Canciones-poemas-escritos"; // donde están tus poemas .md
 
   const $status=document.getElementById("status"),$list=document.getElementById("lista"),
         $count=document.getElementById("count"),$q=document.getElementById("q"),
         $viewer=document.getElementById("viewer"),$note=document.getElementById("note"),
         $back=document.getElementById("back");
 
-  // ===== Fechas (con hora y a. m./p. m.) =====
-  function parseDate(raw){
-    if(!raw) return null;
-    const s = String(raw).trim();
+  // ======== Utilidades de fecha (ES/EN) ========
+  const MONTHS = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12,
+                  january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
 
-    // 1) "6:44 p. m. - septiembre 15, 2025"  (hora 12h + AM/PM con puntos + mes día, año)
-    let m = s.match(/^(\d{1,2}):(\d{2})\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})$/i);
-    if(m){
-      let h = +m[1], mi = +m[2], ap = m[3].toLowerCase(), mesTxt = m[4].toLowerCase(), D = +m[5], Y = +m[6];
-      const meses = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12,
-                     january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
-      const M = meses[mesTxt]; if(!M) return null;
-      if(/p/.test(ap) && h < 12) h += 12;
-      if(/a/.test(ap) && h === 12) h = 0;
-      return new Date(Y, M-1, D, h, mi);
-    }
+  // 1) Fecha desde frontmatter YAML
+  function getFrontmatterDate(text){
+    const m = text.match(/^---\s*[\s\S]*?---/);
+    if(!m) return null;
+    const fm = m[0];
+    // Busca líneas tipo "date: 2025-09-15 18:44" o "created: 2025-09-15T18:44"
+    const rx = /^\s*(date|created)\s*:\s*["']?([0-9]{4}-[0-9]{2}-[0-9]{2})(?:[ T]([0-9]{2}):([0-9]{2}))?["']?\s*$/mi;
+    const mm = fm.match(rx);
+    if(!mm) return null;
+    const Y=+mm[2].slice(0,4), M=+mm[2].slice(5,7), D=+mm[2].slice(8,10);
+    const h= mm[3]?+mm[3]:0, mi=mm[4]?+mm[4]:0;
+    return new Date(Y,M-1,D,h,mi);
+  }
 
-    // 2) "15 de septiembre de 2025"
-    m = s.match(/^(\d{1,2})\s+de\s+([A-Za-záéíóúñ]+)\s+de\s+(\d{4})$/i);
-    if(m){
-      const D=+m[1], mesTxt=m[2].toLowerCase(), Y=+m[3];
-      const mesesES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
-      const M=mesesES[mesTxt]; if(M) return new Date(Y,M-1,D);
-    }
-
-    // 3) "15 septiembre 2025"
-    m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i);
-    if(m){
-      const D=+m[1], mesTxt=m[2].toLowerCase(), Y=+m[3];
-      const mesesES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
-      const M=mesesES[mesTxt]; if(M) return new Date(Y,M-1,D);
-    }
-
-    // 4) "15/09/2025" o "15-09-2025"
-    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if(m) return new Date(+m[3], +m[2]-1, +m[1]);
-
-    return null;
+  // 2) Fecha desde línea tipo: "6:44 p. m. - septiembre 15, 2025"
+  function getSpanishStamp(text){
+    // Busca la primera ocurrencia en todo el archivo
+    const rx = /(\d{1,2}):(\d{2})\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})/i;
+    const m = text.match(rx);
+    if(!m) return null;
+    let h=+m[1], mi=+m[2], ap=m[3].toLowerCase(), mesTxt=m[4].toLowerCase(), D=+m[5], Y=+m[6];
+    const M = MONTHS[mesTxt]; if(!M) return null;
+    if(/p/.test(ap) && h<12) h+=12;
+    if(/a/.test(ap) && h===12) h=0;
+    return new Date(Y,M-1,D,h,mi);
   }
 
   function formatDate(d){
     if(!d) return "";
     const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
-    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()}`;
+    const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()} ${hh}:${mm}`;
   }
 
   function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
@@ -100,80 +92,81 @@
     return `notes/${withFolder.replace(/\.md$/i,'')}.md`;
   }
 
-  fetch(encodeURI(mdPath))
-  .then(async res=>{
-    if(!res.ok) throw new Error("HTTP "+res.status);
-    let md=await res.text();
-    // limpia frontmatter/json si existieran
-    md=md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-    const lines=md.split(/\r?\n/);
-
-    // detectar cabecera de tabla
-    let headerIdx=-1,dateCol=-1,linkCol=-1;
-    for(let i=0;i<lines.length;i++){
-      if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){ headerIdx=i; break; }
+  // Lee el índice, saca wikilinks únicos
+  async function getLinksFromIndex(){
+    const res = await fetch(encodeURI(mdPath));
+    if(!res.ok) throw new Error("HTTP "+res.status+" al abrir índice");
+    let md = await res.text();
+    // quita frontmatter/JSON si hay
+    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
+    const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
+    const seen = new Map();
+    let m;
+    while((m=re.exec(md))){
+      const target = m[1].trim();
+      const title  = (m[2] || titleFromTarget(target)).trim();
+      seen.set(target, title);
     }
-    if(headerIdx>=0){
-      const headers=lines[headerIdx].split('|').map(c=>c.trim().toLowerCase());
-      headers.forEach((h,idx)=>{ if(/fecha/.test(h)) dateCol=idx; if(/t[ií]tulo|title/.test(h)) linkCol=idx; });
+    return [...seen.entries()].map(([target,title])=>({target,title}));
+  }
+
+  // Para cada nota, busca fecha (frontmatter > sello español)
+  async function enrichWithDate(entry){
+    const url = targetToPath(entry.target);
+    try{
+      const res = await fetch(encodeURI(url));
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const text = await res.text();
+      const d1 = getFrontmatterDate(text);
+      const d2 = d1 || getSpanishStamp(text);
+      return {...entry, date: d2 || null, url};
+    }catch(e){
+      return {...entry, date: null, url, err: String(e)};
     }
+  }
 
-    const rows=[];
-    for(let i=(headerIdx>=0?headerIdx+2:0);i<lines.length;i++){
-      if(!lines[i].includes('|')) continue;
-      const cells=lines[i].split('|').map(c=>c.trim());
-      if(cells.length<2) continue;
-
-      // celda con wikilink [[...]]
-      let linkCell = (linkCol>=0 && /\[\[.+\]\]/.test(cells[linkCol])) ? cells[linkCol] : cells.find(c=>/\[\[.+\]\]/.test(c));
-      if(!linkCell) continue;
-
-      const m = linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/);
-      if(!m) continue;
-
-      const target=m[1].trim(), title=(m[2]||titleFromTarget(m[1])).trim();
-
-      let dateText = (dateCol>=0 && cells[dateCol]) ? cells[dateCol] : '';
-      if(!dateText){
-        dateText = cells.find(c => /\d{4}|\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(c)) || '';
-      }
-      const date=parseDate(dateText);
-
-      rows.push({title,target,date});
-    }
-
-    // fallback: si no hubo tabla, sacar todos los [[links]]
-    if(rows.length===0){
-      const seen=new Map(); const re=/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g; let m;
-      while((m=re.exec(md))){ const tgt=m[1].trim(); const ttl=(m[2]||titleFromTarget(tgt)).trim(); seen.set(tgt,ttl); }
-      for(const [tgt,ttl] of seen.entries()) rows.push({title:ttl,target:tgt,date:null});
-    }
-
-    // ordenar nuevo → viejo (si no hay fecha, al final por título)
-    rows.sort((a,b)=>{
-      if(a.date && b.date) return b.date - a.date;
-      if(a.date && !b.date) return -1;
-      if(!a.date && b.date) return 1;
-      return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
-    });
-
-    renderList(rows);
-    $status.textContent = rows.length ? "✅ Cargado" : "⚠️ Índice vacío";
-    $q.addEventListener("input",()=>{const q=$q.value.toLowerCase();renderList(rows.filter(r=>r.title.toLowerCase().includes(q)));});
-  })
-  .catch(err=>{$status.textContent="❌ "+err.message});
-
+  // Render
   function renderList(items){
-    $list.innerHTML=items.map(r=>{
-      const url=encodeURI(targetToPath(r.target));
-      const d=r.date?`<span class="date">· ${formatDate(r.date)}</span>`:"";
-      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a> ${d}</li>`;
+    const $list=document.getElementById("lista"), $count=document.getElementById("count");
+    $list.innerHTML = items.map(r=>{
+      const d = r.date ? `<span class="date">· ${formatDate(r.date)}</span>` : "";
+      return `<li class="item"><a href="#" data-url="${encodeURI(r.url)}">${escapeHtml(r.title)}</a> ${d}</li>`;
     }).join("");
-    $count.textContent=items.length;
-    // abrir nota dentro de la página
+    $count.textContent = items.length;
+
+    // abrir nota dentro
     $list.querySelectorAll("a").forEach(a=>{
       a.addEventListener("click",(ev)=>{ev.preventDefault();openNote(a.dataset.url);});
     });
+  }
+
+  async function main(){
+    try{
+      $status.textContent = "Leyendo índice…";
+      const links = await getLinksFromIndex();
+      if(links.length===0){ $status.textContent="⚠️ Índice vacío"; return; }
+
+      $status.textContent = "Leyendo fechas de cada poema…";
+      const enriched = await Promise.all(links.map(enrichWithDate));
+
+      // Orden: nuevo→viejo por fecha+hora; sin fecha al final por título
+      enriched.sort((a,b)=>{
+        if(a.date && b.date) return b.date - a.date;
+        if(a.date && !b.date) return -1;
+        if(!a.date && b.date) return 1;
+        return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
+      });
+
+      renderList(enriched);
+      $status.textContent = "✅ Cargado";
+      $q.addEventListener("input",()=>{
+        const q=$q.value.toLowerCase();
+        const filtered = enriched.filter(r=>r.title.toLowerCase().includes(q));
+        renderList(filtered);
+      });
+    }catch(e){
+      $status.textContent = "❌ "+String(e);
+    }
   }
 
   function openNote(url){
@@ -184,8 +177,12 @@
     }).catch(err=>{$note.innerHTML=`<p>❌ ${err.message}</p><p><code>${url}</code></p>`;});
   }
 
-  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
   function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  // Arrancar
+  main();
+  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
 </script>
 </body>
 </html>
+
