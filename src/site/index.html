@@ -92,28 +92,49 @@
     md=md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
     const lines=md.split(/\r?\n/);
 
+    // Detecta encabezado de tabla y columnas (Fecha + Título)
     let headerIdx=-1,dateCol=-1,linkCol=-1;
     for(let i=0;i<lines.length;i++){ if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){ headerIdx=i; break; } }
     if(headerIdx>=0){
       const headers=lines[headerIdx].split('|').map(c=>c.trim().toLowerCase());
-      headers.forEach((h,idx)=>{ if(/fecha/.test(h)) dateCol=idx; if(/t[ií]tulo/.test(h)) linkCol=idx; });
+      headers.forEach((h,idx)=>{ if(/\b(fecha|fecha de creaci[oó]n|creaci[oó]n|date)\b/.test(h)) dateCol=idx; if(/\b(t[ií]tulo|title)\b/.test(h)) linkCol=idx; });
     }
 
     const rows=[];
     for(let i=(headerIdx>=0?headerIdx+2:0);i<lines.length;i++){
       if(!lines[i].includes('|')) continue;
       const cells=lines[i].split('|').map(c=>c.trim());
-      let linkCell=cells.find(c=>/\[\[.+\]\]/.test(c)); if(!linkCell) continue;
-      const m=linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/); if(!m) continue;
-      const target=m[1].trim(), title=(m[2]||titleFromTarget(target)).trim();
-      const dateText=(dateCol>=0&&cells[dateCol])?cells[dateCol]:"";
-      const date=parseDate(dateText);
+      if(cells.length<2) continue;
+
+      // Busca wikilink en la fila (en la columna de título o en cualquiera)
+      let linkCell = (linkCol>=0 && /\[\[.+\]\]/.test(cells[linkCol])) ? cells[linkCol] : cells.find(c=>/\[\[.+\]\]/.test(c));
+      if(!linkCell) continue;
+
+      const m = linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/);
+      if(!m) continue;
+
+      const target=m[1].trim(), title=(m[2]||titleFromTarget(m[1])).trim();
+
+      let dateText = (dateCol>=0 && cells[dateCol]) ? cells[dateCol] : '';
+      if(!dateText){
+        dateText = cells.find(c => /\d{4}|\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(c)) || '';
+      }
+      const date = parseDate(dateText);
+
       rows.push({title,target,date});
     }
 
+    // 🔁 Fallback: si no había tabla, extrae TODOS los [[enlaces]]
+    if(rows.length===0){
+      const seen=new Map(); const re=/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g; let m;
+      while((m=re.exec(md))){ const tgt=m[1].trim(); const ttl=(m[2]||titleFromTarget(tgt)).trim(); seen.set(tgt,ttl); }
+      for(const [tgt,ttl] of seen.entries()) rows.push({title:ttl,target:tgt,date:null});
+    }
+
+    // ORDEN: nuevo → viejo; sin fecha al final (alfabético)
     rows.sort((a,b)=>{ if(a.date&&b.date) return b.date-a.date; if(a.date&&!b.date) return -1; if(!a.date&&b.date) return 1; return a.title.localeCompare(b.title,"es",{sensitivity:"base"}); });
 
-    renderList(rows); $status.textContent="✅ Cargado";
+    renderList(rows); $status.textContent = rows.length ? "✅ Cargado" : "⚠️ No se encontraron poemas en el índice";
     $q.addEventListener("input",()=>{const q=$q.value.toLowerCase();renderList(rows.filter(r=>r.title.toLowerCase().includes(q)));});
   })
   .catch(err=>{$status.textContent="❌ "+err.message});
