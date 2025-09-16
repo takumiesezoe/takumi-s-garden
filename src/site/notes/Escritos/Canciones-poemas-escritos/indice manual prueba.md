@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/indice-manual-prueba/","tags":["gardenEntry"]}
+{"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/indice-manual-prueba/"}
 ---
 
 # Índice de poemas (portada)
