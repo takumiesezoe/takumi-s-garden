@@ -16,8 +16,7 @@
   .badge{font-size:12px;color:#c7c7d4;background:#1a1a24;border:1px solid #2a2a37;padding:3px 8px;border-radius:999px}
   ul.list{list-style:none;padding:0;margin:0;display:grid;gap:10px}
   .item a{display:inline-block;padding:12px 14px;border:1px solid #232330;border-radius:12px;background:#0f0f15;text-decoration:none;color:var(--text)}
-  .item a:hover{border-color:var(--accent)}.date{margin-left:10px;color:#c9c9d3;font-size:12px}
-  .viewer{margin-top:18px;padding:18px;border:1px solid #232330;border-radius:14px;background:#0f0f15}
+  .item a:hover{border-color:var(--accent)}.viewer{margin-top:18px;padding:18px;border:1px solid #232330;border-radius:14px;background:#0f0f15}
   .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -38,52 +37,14 @@
 </div></div>
 
 <script>
-  // RUTAS: ajusta si cambias carpetas
+  // RUTAS
   const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
-  const baseFolder = "Escritos/Canciones-poemas-escritos"; // donde están tus poemas .md
+  const baseFolder = "Escritos/Canciones-poemas-escritos";
 
   const $status=document.getElementById("status"),$list=document.getElementById("lista"),
         $count=document.getElementById("count"),$q=document.getElementById("q"),
         $viewer=document.getElementById("viewer"),$note=document.getElementById("note"),
         $back=document.getElementById("back");
-
-  // ======== Utilidades de fecha (ES/EN) ========
-  const MONTHS = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12,
-                  january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
-
-  // 1) Fecha desde frontmatter YAML
-  function getFrontmatterDate(text){
-    const m = text.match(/^---\s*[\s\S]*?---/);
-    if(!m) return null;
-    const fm = m[0];
-    // Busca líneas tipo "date: 2025-09-15 18:44" o "created: 2025-09-15T18:44"
-    const rx = /^\s*(date|created)\s*:\s*["']?([0-9]{4}-[0-9]{2}-[0-9]{2})(?:[ T]([0-9]{2}):([0-9]{2}))?["']?\s*$/mi;
-    const mm = fm.match(rx);
-    if(!mm) return null;
-    const Y=+mm[2].slice(0,4), M=+mm[2].slice(5,7), D=+mm[2].slice(8,10);
-    const h= mm[3]?+mm[3]:0, mi=mm[4]?+mm[4]:0;
-    return new Date(Y,M-1,D,h,mi);
-  }
-
-  // 2) Fecha desde línea tipo: "6:44 p. m. - septiembre 15, 2025"
-  function getSpanishStamp(text){
-    // Busca la primera ocurrencia en todo el archivo
-    const rx = /(\d{1,2}):(\d{2})\s*(a\.?\s?m\.?|p\.?\s?m\.?|AM|PM)\s*-\s*([A-Za-záéíóúñ]+)\s+(\d{1,2}),\s*(\d{4})/i;
-    const m = text.match(rx);
-    if(!m) return null;
-    let h=+m[1], mi=+m[2], ap=m[3].toLowerCase(), mesTxt=m[4].toLowerCase(), D=+m[5], Y=+m[6];
-    const M = MONTHS[mesTxt]; if(!M) return null;
-    if(/p/.test(ap) && h<12) h+=12;
-    if(/a/.test(ap) && h===12) h=0;
-    return new Date(Y,M-1,D,h,mi);
-  }
-
-  function formatDate(d){
-    if(!d) return "";
-    const short=['ene','feb','mar','abr','may','jun','jul','ago','sept','oct','nov','dic'];
-    const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
-    return `${d.getDate()} ${short[d.getMonth()]} ${d.getFullYear()} ${hh}:${mm}`;
-  }
 
   function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
   function targetToPath(t){
@@ -92,102 +53,6 @@
     return `notes/${withFolder.replace(/\.md$/i,'')}.md`;
   }
 
-  // Lee el índice, saca wikilinks únicos
   async function getLinksFromIndex(){
     const res = await fetch(encodeURI(mdPath));
-    if(!res.ok) throw new Error("HTTP "+res.status+" al abrir índice");
-    let md = await res.text();
-    // quita frontmatter/JSON si hay
-    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-    const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
-    const seen = new Map();
-    let m;
-    while((m=re.exec(md))){
-      const target = m[1].trim();
-      const title  = (m[2] || titleFromTarget(target)).trim();
-      seen.set(target, title);
-    }
-    return [...seen.entries()].map(([target,title])=>({target,title}));
-  }
-
-  // Para cada nota, busca fecha (frontmatter > sello español)
-  async function enrichWithDate(entry){
-    const url = targetToPath(entry.target);
-    try{
-      const res = await fetch(encodeURI(url));
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const text = await res.text();
-      const d1 = getFrontmatterDate(text);
-      const d2 = d1 || getSpanishStamp(text);
-      return {...entry, date: d2 || null, url};
-    }catch(e){
-      return {...entry, date: null, url, err: String(e)};
-    }
-  }
-
-  // Render
-  function renderList(items){
-    const $list=document.getElementById("lista"), $count=document.getElementById("count");
-    $list.innerHTML = items.map(r=>{
-      const d = r.date ? `<span class="date">· ${formatDate(r.date)}</span>` : "";
-      return `<li class="item"><a href="#" data-url="${encodeURI(r.url)}">${escapeHtml(r.title)}</a> ${d}</li>`;
-    }).join("");
-    $count.textContent = items.length;
-
-    // abrir nota dentro
-    $list.querySelectorAll("a").forEach(a=>{
-      a.addEventListener("click",(ev)=>{ev.preventDefault();openNote(a.dataset.url);});
-    });
-  }
-  
-const ORDER_MODE = "index"; // "index" para respetar el orden del .md, "date" para ordenar por fecha
-  async function main(){
-    try{
-      $status.textContent = "Leyendo índice…";
-      const links = await getLinksFromIndex();
-      if(links.length===0){ $status.textContent="⚠️ Índice vacío"; return; }
-
-      $status.textContent = "Leyendo fechas de cada poema…";
-      const enriched = await Promise.all(links.map(enrichWithDate));
-
-     if (ORDER_MODE === "date") {
-  // nuevo→viejo por fecha+hora; sin fecha al final por título
-  enriched.sort((a,b)=>{
-    if(a.date && b.date) return b.date - a.date;
-    if(a.date && !b.date) return -1;
-    if(!a.date && b.date) return 1;
-    return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
-  });
-}
-// si ORDER_MODE === "index", NO tocamos el orden: se queda tal cual venga del .md
-
-
-      renderList(enriched);
-      $status.textContent = "✅ Cargado";
-      $q.addEventListener("input",()=>{
-        const q=$q.value.toLowerCase();
-        const filtered = enriched.filter(r=>r.title.toLowerCase().includes(q));
-        renderList(filtered);
-      });
-    }catch(e){
-      $status.textContent = "❌ "+String(e);
-    }
-  }
-
-  function openNote(url){
-    $viewer.hidden=false;$note.innerHTML="<p class='muted'>Cargando…</p>";
-    fetch(url).then(async res=>{
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const md=await res.text();$note.innerHTML=marked.parse(md);$note.scrollIntoView({behavior:"smooth"});
-    }).catch(err=>{$note.innerHTML=`<p>❌ ${err.message}</p><p><code>${url}</code></p>`;});
-  }
-
-  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-  // Arrancar
-  main();
-  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
-</script>
-</body>
-</html>
-
+    if(!res.ok) throw new Error
