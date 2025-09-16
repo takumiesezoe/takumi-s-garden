@@ -2,113 +2,188 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<title>Índice de Poemas — Takumi’s Garden</title>
+<title>Takumi’s Garden — Índice</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root{--bg:#0b0b0e;--card:#14141a;--muted:#b8b8c6;--text:#f3f3f7;--accent:#a78bfa}
+  :root{
+    --bg:#0a0a0a;           /* negro */
+    --card:#131016;         /* negro con tinte granate */
+    --ink:#f5f3f7;          /* texto claro */
+    --muted:#b9a8ba;        /* gris rosado */
+    --accent:#d36ea6;       /* rosado pastel */
+    --garnet:#8b1e3f;       /* granate */
+    --line:#241a24;         /* borde sutil */
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  .wrap{max-width:920px;margin:48px auto;padding:24px}
-  .card{background:var(--card);border:1px solid #1f1f28;border-radius:16px;padding:24px}
-  h1{margin:0 0 8px;font-size:clamp(22px,4vw,34px)}p.muted{color:var(--muted);margin:0 0 16px}
-  .controls{display:flex;gap:12px;align-items:center;margin:8px 0 16px}
-  input[type="search"]{flex:1;background:#0e0e13;border:1px solid #2a2a37;color:var(--text);padding:12px 14px;border-radius:12px;font-size:16px}
-  .badge{font-size:12px;color:#c7c7d4;background:#1a1a24;border:1px solid #2a2a37;padding:3px 8px;border-radius:999px}
-  ul.list{list-style:none;padding:0;margin:0;display:grid;gap:10px}
-  .item a{display:inline-block;padding:12px 14px;border:1px solid #232330;border-radius:12px;background:#0f0f15;text-decoration:none;color:var(--text)}
-  .item a:hover{border-color:var(--accent)}.viewer{margin-top:18px;padding:18px;border:1px solid #232330;border-radius:14px;background:#0f0f15}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  .wrap{max-width:980px;margin:42px auto;padding:0 18px}
+  .card{background:linear-gradient(180deg,rgba(139,30,63,0.08),transparent 60%) , var(--card);
+        border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px);letter-spacing:.3px}
+  .muted{color:var(--muted)}
+  code{background:#0f0b10;border:1px solid var(--line);padding:2px 6px;border-radius:8px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
+  input[type="search"]{flex:1;min-width:240px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);
+    padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
+  input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.2)}
+  .badge{font-size:12px;color:#f1ddea;background:#2a1824;border:1px solid #442034;padding:3px 8px;border-radius:999px}
+  ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .item a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
+  .item a:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
+  .meta{font-size:12px;color:var(--muted)}
+  .viewer{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
+  .small{font-size:12px;color:var(--muted)}
+  hr{border:none;border-top:1px solid var(--line);margin:14px 0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-<div class="wrap"><div class="card">
-  <h1>🗂️ Índice de poemas</h1>
-  <p id="status" class="muted">Cargando…</p>
-  <div class="controls">
-    <input id="q" type="search" placeholder="Buscar título…" />
-    <span id="count" class="badge">0</span>
+<div class="wrap">
+  <div class="card">
+    <h1>🗂️ Índice de poemas</h1>
+    <p id="status" class="muted">Buscando índice…</p>
+
+    <div class="row">
+      <input id="q" type="search" placeholder="Buscar título…" />
+      <span id="count" class="badge">0</span>
+    </div>
+
+    <p class="small">Índice encontrado en: <code id="chosenPath">—</code></p>
+    <p class="small">Carpeta base de poemas: <code id="baseFolderShow">—</code></p>
+
+    <ul id="lista" class="list"></ul>
+
+    <div id="viewer" class="viewer" hidden>
+      <a href="#" id="back" class="back">← Volver al índice</a>
+      <div id="note"></div>
+    </div>
   </div>
-  <ul id="lista" class="list"></ul>
-  <div id="viewer" class="viewer" hidden>
-    <a href="#" id="back" class="back">← Volver al índice</a>
-    <div id="note"></div>
-  </div>
-</div></div>
+</div>
 
 <script>
-  // 🔧 Rutas corregidas según tu repo
-  const mdPath = "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos/indice pagina web.md";
-  const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
+  // ====== Auto-detección del índice ======
+  const $status = document.getElementById("status");
+  const $lista  = document.getElementById("lista");
+  const $viewer = document.getElementById("viewer");
+  const $note   = document.getElementById("note");
+  const $q      = document.getElementById("q");
+  const $count  = document.getElementById("count");
+  const $chosen = document.getElementById("chosenPath");
+  const $baseShow = document.getElementById("baseFolderShow");
+  const $back   = document.getElementById("back");
 
-  const $status=document.getElementById("status"),$list=document.getElementById("lista"),
-        $count=document.getElementById("count"),$q=document.getElementById("q"),
-        $viewer=document.getElementById("viewer"),$note=document.getElementById("note"),
-        $back=document.getElementById("back");
+  // Candidatos: incluye tu estructura con "Canciones-poemas-escritos/Canciones poemas escritos/indice pagina web.md"
+  const fileNames = [
+    "indice pagina web.md","Indice pagina web.md","índice pagina web.md","Índice pagina web.md",
+    "Escritos_indice_con_enlace.md","index.md","Indice.md"
+  ];
+  const folders = [
+    "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos",
+    "notes/Escritos/canciones poemas escritos",
+    "notes/Escritos/Canciones poemas escritos",
+    "notes/Escritos/Canciones-poemas-escritos",
+    "notes/Escritos",
+    "notes"
+  ];
+  const candidates=[]; for (const f of folders){ for(const n of fileNames){ candidates.push(`${f}/${n}`); } }
 
-  function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
-  function targetToPath(t){
-    const clean=t.replace(/^notes\//,'').replace(/^\//,'');
-    const withFolder=clean.includes('/')?clean:`${baseFolder}/${clean}`;
+  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  function titleFromTarget(t){return decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));}
+  function deduceBaseFolder(mdPath){
+    // mdPath = "notes/<carpetas>/archivo.md" → devolvemos "<carpetas>" sin "notes/"
+    const p = mdPath.split("/"); p.pop(); return p.slice(1).join("/");
+  }
+  function targetToPath(baseFolder, target){
+    const clean = target.replace(/^notes\//,'').replace(/^\//,'');
+    const withFolder = clean.includes('/') ? clean : `${baseFolder}/${clean}`;
     return `notes/${withFolder.replace(/\.md$/i,'')}.md`;
   }
-
-  async function getLinksFromIndex(){
-    const res = await fetch(encodeURI(mdPath));
-    if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
-    let md = await res.text();
+  async function tryFetch(url){
+    try{ const r = await fetch(encodeURI(url)); if(!r.ok) return null; return await r.text(); }
+    catch{ return null; }
+  }
+  async function findIndex(){
+    for(const p of candidates){
+      const t = await tryFetch(p);
+      if(t!==null) return {path:p,text:t};
+    }
+    return null;
+  }
+  function extractLinks(md){
+    // limpia frontmatter/JSON si existiera
     md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-    const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
-    const items=[];
-    let m;
-    while((m=re.exec(md))){
-      const target=m[1].trim();
-      const title=(m[2]||titleFromTarget(target)).trim();
-      items.push({target,title});
+    // 1) líneas con viñetas "- [[Titulo]]"
+    const bullet = [...md.matchAll(/^\s*[-*+]\s+\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/mg)];
+    if(bullet.length){
+      return bullet.map(m=>({target:m[1].trim(), title:(m[2]||titleFromTarget(m[1])).trim()}));
     }
-    return items;
+    // 2) si no hay viñetas, coge todos los [[links]]
+    const all = [...md.matchAll(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g)];
+    return all.map(m=>({target:m[1].trim(), title:(m[2]||titleFromTarget(m[1])).trim()}));
   }
 
-  function renderList(items){
-    $list.innerHTML = items.map(r=>{
-      const url=encodeURI(targetToPath(r.target));
-      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a></li>`;
+  function renderList(items, baseFolder){
+    if(!items.length){
+      $status.innerHTML = "<span class='muted'>⚠️ No encontré [[links]] en el índice.</span>";
+      return;
+    }
+    $status.textContent = "✅ Cargado";
+    $count.textContent = items.length;
+    $lista.innerHTML = items.map(it=>{
+      const url = encodeURI(targetToPath(baseFolder, it.target));
+      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(it.title)}</a></li>`;
     }).join("");
-    $count.textContent=items.length;
-
-    $list.querySelectorAll("a").forEach(a=>{
-      a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
-    });
-  }
-
-  async function main(){
-    try{
-      $status.textContent="Leyendo índice…";
-      const links=await getLinksFromIndex();
-      if(links.length===0){$status.textContent="⚠️ Índice vacío";return;}
-      renderList(links);
-      $status.textContent="✅ Cargado";
-      $q.addEventListener("input",()=>{
-        const q=$q.value.toLowerCase();
-        renderList(links.filter(r=>r.title.toLowerCase().includes(q)));
+    // listeners
+    $lista.querySelectorAll("a").forEach(a=>{
+      a.addEventListener("click", ev=>{
+        ev.preventDefault();
+        openNote(a.dataset.url);
       });
-    }catch(e){
-      $status.textContent="❌ "+String(e);
-    }
+    });
+    // buscador
+    $q.oninput = ()=>{
+      const q = $q.value.toLowerCase();
+      const filtered = items.filter(x=>x.title.toLowerCase().includes(q));
+      $count.textContent = filtered.length;
+      $lista.innerHTML = filtered.map(it=>{
+        const url = encodeURI(targetToPath(baseFolder, it.target));
+        return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(it.title)}</a></li>`;
+      }).join("");
+      $lista.querySelectorAll("a").forEach(a=>{
+        a.addEventListener("click", ev=>{
+          ev.preventDefault();
+          openNote(a.dataset.url);
+        });
+      });
+    };
   }
 
   function openNote(url){
-    $viewer.hidden=false;$note.innerHTML="<p class='muted'>Cargando…</p>";
-    fetch(url).then(async res=>{
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const md=await res.text();$note.innerHTML=marked.parse(md);$note.scrollIntoView({behavior:"smooth"});
-    }).catch(err=>{$note.innerHTML=`<p>❌ ${err.message}</p><p><code>${url}</code></p>`;});
+    $viewer.hidden = false;
+    $note.innerHTML = "<p class='muted'>Cargando poema…</p>";
+    fetch(url)
+      .then(r=>{ if(!r.ok) throw new Error(`No se pudo abrir ${url} (${r.status})`); return r.text(); })
+      .then(md=>{ $note.innerHTML = marked.parse(md); $note.scrollIntoView({behavior:"smooth"}); })
+      .catch(e=>{ $note.innerHTML = `<p style="color:#ff8aa8">❌ ${escapeHtml(String(e))}</p><p><code>${url}</code></p>`; });
   }
 
-  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
-  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  // Arranque
+  (async function main(){
+    $status.textContent = "🔎 Buscando índice en varias rutas…";
+    const found = await findIndex();
+    if(!found){
+      $status.innerHTML = "❌ No encontré el archivo de índice en rutas comunes.<br><span class='small'>Crea o confirma un archivo como <code>indice pagina web.md</code> dentro de <code>src/site/notes/…</code>.</span>";
+      return;
+    }
+    $chosen.textContent = found.path;
+    const baseFolder = deduceBaseFolder(found.path);
+    $baseShow.textContent = baseFolder;
+    const links = extractLinks(found.text);
+    renderList(links, baseFolder);
+  })();
 
-  main();
+  document.getElementById("back").addEventListener("click",(e)=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
 </script>
 </body>
 </html>
