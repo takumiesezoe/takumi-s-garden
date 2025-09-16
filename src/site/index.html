@@ -47,7 +47,7 @@
     </div>
 
     <script>
-      // RUTA EXACTA de tu índice dentro de src/site/
+      // 👉 Ajusta la ruta EXACTA a tu índice .md (case-sensitive)
       const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
 
       const $ruta   = document.getElementById("ruta");
@@ -60,143 +60,91 @@
       const $back   = document.getElementById("back");
       $ruta.textContent = mdPath;
 
-      // Utilidades
-      function parseDate(s){
-        // limpia cosas tipo "6:44 PM - September 15, 2025"
-        if(!s) return null;
-        s = s.replace(/^[^A-Za-z0-9]+/,"");         // quita guiones, espacios
-        // si tiene " - " nos quedamos con la parte de la fecha
-        const parts = s.split(" - ");
-        const dateStr = parts.length>1 ? parts[1] : s;
-        const d = new Date(dateStr.trim());
-        return isNaN(d) ? null : d;
-      }
-      function titleFromTarget(t){
-        const seg = t.split("/").pop();
-        return decodeURIComponent(seg.replace(/\.md$/i,""));
-      }
-      function hrefFromTarget(t){
-        const target = t.endsWith(".md") ? t : t + ".md";
-        return "notes/" + target.replace(/^notes\//,"");
+      // ==== Función de parseo de fechas (ES + EN) ====
+      function parseDate(raw){
+        if(!raw) return null;
+        let s = String(raw).trim();
+        s = s.replace(/^\s*[\-\–]\s*/,'').replace(/^\s*\d{1,2}:\d{2}\s?(AM|PM)\s?\-\s?/i,'');
+        s = s.replace(/\s+/g,' ').trim();
+        const monthsES = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+        const monthsEN = {january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+        let m;
+
+        if(m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?$/)) return new Date(+m[1],+m[2]-1,+m[3],m[4]||0,m[5]||0);
+        if(m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})(?:[ T](\d{1,2}):(\d{2}))?$/)) return new Date(+m[3],+m[2]-1,+m[1],m[4]||0,m[5]||0);
+        if(m = s.match(/^(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})$/i)){const D=+m[1],mes=m[2].toLowerCase(),Y=+m[3];const M=monthsES[mes]||monthsEN[mes];if(M)return new Date(Y,M-1,D);}
+        if(m = s.match(/^([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})$/)){const mes=m[1].toLowerCase(),D=+m[2],Y=+m[3];const M=monthsEN[mes];if(M)return new Date(Y,M-1,D);}
+        if(m = s.match(/(\d{1,2})\s+([A-Za-záéíóúñ]+)\s+(\d{4})/i)){const D=+m[1],mes=m[2].toLowerCase(),Y=+m[3];const M=monthsES[mes]||monthsEN[mes];if(M)return new Date(Y,M-1,D);}
+        const dt=new Date(s);return isNaN(dt)?null:dt;
       }
 
-      // Cargar el índice .md y parsear tabla (Nº | Idioma | Fecha | Título)
+      function titleFromTarget(t){return decodeURIComponent(t.split("/").pop().replace(/\.md$/i,""));}
+      function hrefFromTarget(t){const target=t.endsWith(".md")?t:t+".md";return "notes/"+target.replace(/^notes\//,"");}
+
+      // ==== Cargar índice y parsear tabla ====
       fetch(encodeURI(mdPath))
         .then(async res => {
-          if(!res.ok) throw new Error("HTTP " + res.status + " ("+res.statusText+")");
+          if(!res.ok) throw new Error("HTTP " + res.status);
           let md = await res.text();
-
-          // Quitar YAML/frontmatter arriba y bloques JSON
           md = md.replace(/^---[\s\S]*?---\s*/,"");
           md = md.replace(/^\{[\s\S]*?\}\s*/,"");
-
           const lines = md.split(/\r?\n/);
-          const rows = [];
 
-          for(const ln of lines){
-            // fila de tabla con '|' y un wikilink
-            if(ln.includes("|") && ln.includes("[[")){
-              const cells = ln.split("|").map(c => c.trim());
-              // esperados: "", Nº, Idioma, Fecha, Título, "" (por bordes)
-              let dateCell = null, linkCell = null;
-              // busca la celda con fecha (contiene mes en inglés) y la del link
-              for(const c of cells){
-                if(/\[\[.+\]\]/.test(c)) linkCell = c;
-                if(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(c)){
-                  dateCell = c;
-                }
-              }
-              if(linkCell){
-                const m = linkCell.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/);
-                if(m){
-                  const target = m[1].trim();
-                  const title  = (m[2] || titleFromTarget(target)).trim();
-                  const date   = parseDate(dateCell || "");
-                  rows.push({title, target, date});
-                }
-              }
-            }
+          let headerIdx=-1,dateCol=-1,linkCol=-1;
+          for(let i=0;i<lines.length;i++){if(lines[i].includes('|') && /---/.test(lines[i+1]||'')){headerIdx=i;break;}}
+          if(headerIdx>=0){
+            const headers=lines[headerIdx].split('|').map(c=>c.trim().toLowerCase());
+            headers.forEach((h,idx)=>{if(/fecha|creaci[oó]n|date/.test(h))dateCol=idx;if(/t[ií]tulo|title/.test(h))linkCol=idx;});
           }
 
-          // Si no detecta tabla, como fallback extrae todos los [[links]] y sin fecha
+          const rows=[];
+          for(let i=(headerIdx>=0?headerIdx+2:0);i<lines.length;i++){
+            const cells=lines[i].split('|').map(c=>c.trim());
+            if(cells.length<2) continue;
+            let linkCellText=null;
+            if(linkCol>=0 && /\[\[.+\]\]/.test(cells[linkCol])) linkCellText=cells[linkCol];
+            else linkCellText=cells.find(c=>/\[\[.+\]\]/.test(c));
+            if(!linkCellText) continue;
+            const m=linkCellText.match(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/);
+            if(!m) continue;
+            const target=m[1].trim(), title=(m[2]||titleFromTarget(target)).trim();
+            let dateText=(dateCol>=0&&cells[dateCol])?cells[dateCol]:'';
+            if(!dateText){dateText=cells.find(c=>/\d{4}|\b(enero|febrero|...|december)\b/i.test(c))||'';}
+            const date=parseDate(dateText);
+            rows.push({title,target,date});
+          }
+
           if(rows.length===0){
-            const all = [...md.matchAll(/\[\{0,0}\]/g)]; // dummy to keep syntax highlighter calm
-          }
-          if(rows.length===0){
-            const map = new Map();
-            const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
-            let m; 
-            while((m = re.exec(md))){
-              const target = m[1].trim();
-              const title  = (m[2] || titleFromTarget(target)).trim();
-              map.set(target, title);
-            }
-            for(const [target,title] of map.entries()){
-              rows.push({title, target, date:null});
-            }
+            const re=/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;let m;const map=new Map();
+            while((m=re.exec(md))){map.set(m[1].trim(),(m[2]||titleFromTarget(m[1])).trim());}
+            for(const [target,title] of map.entries()){rows.push({title,target,date:null});}
           }
 
-          // Ordenar por fecha (nuevos primero); sin fecha al final por título
-          rows.sort((a,b)=>{
-            if(a.date && b.date) return b.date - a.date;
-            if(a.date && !b.date) return -1;
-            if(!a.date && b.date) return 1;
-            return a.title.localeCompare(b.title,"es",{sensitivity:"base"});
-          });
+          rows.sort((a,b)=>{if(a.date&&b.date)return b.date-a.date;if(a.date&&!b.date)return -1;if(!a.date&&b.date)return 1;return a.title.localeCompare(b.title,"es",{sensitivity:"base"});});
 
           renderList(rows);
-          $status.innerHTML = "<span class='ok'>✅ Cargado</span>";
-
-          // Buscador
-          $q.addEventListener("input", ()=>{
-            const q = $q.value.trim().toLowerCase();
-            const filtered = rows.filter(r => r.title.toLowerCase().includes(q));
-            renderList(filtered);
-          });
-
-        }).catch(err=>{
-          $status.innerHTML = "<span class='err'>❌ "+err.message+"</span><br>Comprueba que existe <code>src/site/"+mdPath+"</code>";
-        });
+          $status.innerHTML="<span class='ok'>✅ Cargado</span>";
+          $q.addEventListener("input",()=>{const q=$q.value.toLowerCase();renderList(rows.filter(r=>r.title.toLowerCase().includes(q)));});
+        })
+        .catch(err=>{$status.innerHTML="<span class='err'>❌ "+err.message+"</span>";});
 
       function renderList(items){
-        $list.innerHTML = items.map(r=>{
-          const href = "./" + encodeURI(hrefFromTarget(r.target));
-          return `<li class="item"><a href="${href}" data-target="${encodeURI(hrefFromTarget(r.target))}">${escapeHtml(r.title)}</a></li>`;
-        }).join("");
-        $count.textContent = items.length;
-
-        // Interceptar clic → abrir la nota dentro de la página (sin 404)
-        $list.querySelectorAll("a").forEach(a=>{
-          a.addEventListener("click", (ev)=>{
-            ev.preventDefault();
-            const url = a.getAttribute("data-target");
-            openNote(url);
-          });
-        });
+        $list.innerHTML=items.map(r=>`<li class="item"><a href="#" data-target="${encodeURI(hrefFromTarget(r.target))}">${escapeHtml(r.title)}</a></li>`).join("");
+        $count.textContent=items.length;
+        $list.querySelectorAll("a").forEach(a=>{a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.target);});});
       }
 
       function openNote(url){
-        $viewer.hidden = false;
-        $note.innerHTML = "<p class='muted'>Cargando…</p>";
-        fetch(encodeURI(url))
-          .then(async res=>{
-            if(!res.ok) throw new Error("HTTP " + res.status + " ("+res.statusText+")");
-            const md = await res.text();
-            $note.innerHTML = marked.parse(md);
-            $note.scrollIntoView({behavior:"smooth", block:"start"});
-          })
-          .catch(err=>{
-            $note.innerHTML = `<p class="err">❌ No se pudo abrir la nota: ${escapeHtml(err.message)}</p><p>Ruta: <code>${escapeHtml(url)}</code></p>`;
-          });
+        $viewer.hidden=false;$note.innerHTML="<p class='muted'>Cargando…</p>";
+        fetch(encodeURI(url)).then(async res=>{
+          if(!res.ok) throw new Error("HTTP "+res.status);
+          const md=await res.text();
+          $note.innerHTML=marked.parse(md);
+          $note.scrollIntoView({behavior:"smooth"});
+        }).catch(err=>{$note.innerHTML=`<p class="err">❌ ${escapeHtml(err.message)}</p><p><code>${url}</code></p>`;});
       }
-
-      document.getElementById("back").addEventListener("click", (e)=>{
-        e.preventDefault();
-        $viewer.hidden = true;
-        window.scrollTo({top:0, behavior:"smooth"});
-      });
-
-      function escapeHtml(s){return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+      $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
+      function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
     </script>
   </body>
 </html>
