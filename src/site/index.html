@@ -1,39 +1,111 @@
 <!doctype html>
-<html>
+<html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Takumi’s Garden — Índice</title>
+    <title>Índice de Poemas — Takumi’s Garden</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      body { font-family: system-ui, -apple-system, Arial, sans-serif; margin: 32px; max-width: 860px; }
-      code { background: #111; color: #eee; padding: 2px 6px; border-radius: 4px; }
-      .ok { color: #0a0; } .err { color: #c00; font-weight: 600; }
+      :root { --bg:#0c0c0f; --card:#141419; --muted:#b6b6c3; --text:#f2f2f7; --accent:#a78bfa; --accent2:#7c3aed; }
+      *{box-sizing:border-box}
+      body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+      .wrap{max-width:880px;margin:48px auto;padding:24px}
+      .card{background:var(--card);border:1px solid #1e1e26;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+      h1{margin:0 0 16px;font-weight:700;font-size:clamp(24px,4vw,34px)}
+      p.muted{color:var(--muted);margin:6px 0 18px}
+      .controls{display:flex;gap:12px;align-items:center;margin:10px 0 18px}
+      input[type="search"]{flex:1;background:#0e0e13;border:1px solid #2a2a37;color:var(--text);padding:12px 14px;border-radius:12px;font-size:16px;outline:none}
+      .list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr;gap:10px}
+      .item a{display:block;padding:12px 14px;border:1px solid #232330;border-radius:12px;background:#0e0e14;text-decoration:none;color:var(--text);transition:.15s}
+      .item a:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(167,139,250,.15)}
+      .badge{font-size:12px;color:#c7c7d4;background:#1a1a24;border:1px solid #2a2a37;padding:3px 8px;border-radius:999px;margin-left:8px}
+      .ok{color:#10b981}.err{color:#ef4444}
+      code{background:#0e0e14;border:1px solid #232330;padding:2px 6px;border-radius:6px}
+      footer{margin-top:22px;color:var(--muted);font-size:13px}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   </head>
   <body>
-    <h1>🌑 Índice</h1>
-    <p>Intentando cargar el Markdown desde: <code id="ruta"></code></p>
-    <p id="estado">Cargando…</p>
-    <div id="contenido"></div>
+    <div class="wrap">
+      <div class="card">
+        <h1>🗂️ Índice de poemas</h1>
+        <p id="status" class="muted">Cargando…</p>
+        <div class="controls">
+          <input id="q" type="search" placeholder="Buscar título…" aria-label="Buscar" />
+          <span id="count" class="badge">0</span>
+        </div>
+        <ul id="lista" class="list"></ul>
+        <footer>Fuente: <code id="ruta"></code></footer>
+      </div>
+    </div>
+
     <script>
-      // 👇 PON AQUÍ LA RUTA EXACTA QUE VES EN GITHUB (después de src/site/)
+      // 👉 RUTA EXACTA de tu archivo índice dentro de src/site/
+      // (case-sensitive; ajusta si cambias carpetas/nombre)
       const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
 
-      document.getElementById("ruta").textContent = mdPath;
+      const $ruta  = document.getElementById("ruta");
+      const $status= document.getElementById("status");
+      const $list  = document.getElementById("lista");
+      const $count = document.getElementById("count");
+      const $q     = document.getElementById("q");
+
+      $ruta.textContent = mdPath;
+
+      function titleFromTarget(t){
+        // último segmento sin extensión
+        const seg = t.split("/").pop();
+        return decodeURIComponent(seg.replace(/\.md$/i,""));
+      }
+      function hrefFromTarget(t){
+        // apunta al .md real publicado
+        const target = t.endsWith(".md") ? t : t + ".md";
+        return "./" + encodeURI("notes/" + target.replace(/^notes\//,""));
+      }
 
       fetch(encodeURI(mdPath))
-        .then(async (res) => {
-          if (!res.ok) throw new Error("HTTP " + res.status + " (" + res.statusText + ")");
-          const md = await res.text();
-          document.getElementById("contenido").innerHTML = marked.parse(md);
-          document.getElementById("estado").innerHTML = "<span class='ok'>✅ Cargado</span>";
-        })
-        .catch(err => {
-          document.getElementById("estado").innerHTML =
-            "<span class='err'>❌ Error:</span> " + err.message +
-            "<br>Comprueba que el archivo existe EXACTAMENTE en <code>src/site/" + mdPath + "</code>";
+        .then(async res => {
+          if(!res.ok) throw new Error("HTTP " + res.status + " ("+res.statusText+")");
+          let md = await res.text();
+
+          // Quitar YAML frontmatter y bloques JSON de cabecera
+          md = md.replace(/^---[\s\S]*?---\s*/,"");
+          md = md.replace(/^\{[\s\S]*?\}\s*/,"");
+
+          // Extraer wikilinks [[ruta|Título]] o [[ruta]]
+          const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
+          const map = new Map(); // evitar duplicados por ruta
+          let m;
+          while((m = re.exec(md))){
+            const target = m[1].trim();
+            const text   = (m[2] || titleFromTarget(target)).trim();
+            map.set(target, text);
+          }
+
+          const items = [...map.entries()]
+            .map(([target,text]) => ({ title:text, href:hrefFromTarget(target) }))
+            .sort((a,b)=>a.title.localeCompare(b.title,"es",{sensitivity:"base"}));
+
+          render(items);
+          $status.innerHTML = "<span class='ok'>✅ Cargado</span>";
+
+          // Buscador
+          $q.addEventListener("input", () => {
+            const q = $q.value.trim().toLowerCase();
+            const filtered = items.filter(it => it.title.toLowerCase().includes(q));
+            render(filtered);
+          });
+
+        }).catch(err=>{
+          $status.innerHTML = "<span class='err'>❌ "+err.message+"</span><br>Comprueba que existe <code>src/site/"+mdPath+"</code>";
         });
+
+      function render(rows){
+        $list.innerHTML = rows.map(it =>
+          `<li class="item"><a href="${it.href}">${escapeHtml(it.title)}</a></li>`
+        ).join("");
+        $count.textContent = rows.length;
+      }
+      function escapeHtml(s){return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
     </script>
   </body>
 </html>
