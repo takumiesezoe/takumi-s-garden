@@ -4,36 +4,36 @@
     <meta charset="utf-8" />
     <title>Takumi’s Garden — Índice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Estilos simples -->
     <style>
-      body { font-family: system-ui, -apple-system, Arial, sans-serif; margin: 32px; max-width: 820px; }
-      a { color: #7c3aed; text-decoration: none; }
-      a:hover { text-decoration: underline; }
-      .loading { color: #666; }
-      .error { color: #c00; font-weight: bold; }
+      body { font-family: system-ui, -apple-system, Arial, sans-serif; margin: 32px; max-width: 860px; }
+      code { background: #111; color: #eee; padding: 2px 6px; border-radius: 4px; }
+      .ok { color: #0a0; } .err { color: #c00; font-weight: 600; }
     </style>
-    <!-- Marked.js para convertir Markdown a HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   </head>
   <body>
-    <h1>🌑 Bienvenid@ a mi Digital Garden</h1>
-    <p class="loading" id="status">Cargando índice…</p>
-    <div id="app"></div>
-
+    <h1>🌑 Índice</h1>
+    <p>Intentando cargar el Markdown desde: <code id="ruta"></code></p>
+    <p id="estado">Cargando…</p>
+    <div id="contenido"></div>
     <script>
-      // Ruta EXACTA a tu archivo .md dentro de src/site/notes
-      const mdPath = "./notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
+      // 👇 PON AQUÍ LA RUTA EXACTA QUE VES EN GITHUB (después de src/site/)
+      const mdPath = "notes/Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace.md";
 
-      fetch(mdPath).then(async (res) => {
-        if (!res.ok) throw new Error("No se pudo cargar el índice (" + res.status + ")");
-        const md = await res.text();
-        // Renderiza el Markdown a HTML
-        document.getElementById("app").innerHTML = marked.parse(md);
-        document.getElementById("status").remove();
-      }).catch(err => {
-        document.getElementById("status").className = "error";
-        document.getElementById("status").textContent = "Error: " + err.message;
-      });
+      document.getElementById("ruta").textContent = mdPath;
+
+      fetch(encodeURI(mdPath))
+        .then(async (res) => {
+          if (!res.ok) throw new Error("HTTP " + res.status + " (" + res.statusText + ")");
+          const md = await res.text();
+          document.getElementById("contenido").innerHTML = marked.parse(md);
+          document.getElementById("estado").innerHTML = "<span class='ok'>✅ Cargado</span>";
+        })
+        .catch(err => {
+          document.getElementById("estado").innerHTML =
+            "<span class='err'>❌ Error:</span> " + err.message +
+            "<br>Comprueba que el archivo existe EXACTAMENTE en <code>src/site/" + mdPath + "</code>";
+        });
     </script>
   </body>
 </html>
