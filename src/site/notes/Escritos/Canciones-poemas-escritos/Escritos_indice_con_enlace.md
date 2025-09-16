@@ -1,5 +1,5 @@
 ---
-{"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/escritos-indice-con-enlace/","tags":["gardenEntry"]}
+{"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/escritos-indice-con-enlace/"}
 ---
 
 | Nº | Idioma  | Fecha de creación             | Título                                                                                                                       |
