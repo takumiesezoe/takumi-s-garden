@@ -6,19 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root{
-    --bg:#0a0a0a;
-    --card:#131016;
-    --ink:#f5f3f7;
-    --muted:#b9a8ba;
-    --accent:#d36ea6;
-    --garnet:#8b1e3f;
-    --line:#241a24;
+    --bg:#0a0a0a;      /* negro */
+    --card:#131016;    /* negro con tinte granate */
+    --ink:#f5f3f7;     /* texto claro */
+    --muted:#b9a8ba;   /* gris rosado */
+    --accent:#d36ea6;  /* rosado pastel */
+    --garnet:#8b1e3f;  /* granate */
+    --line:#241a24;    /* borde sutil */
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   .wrap{max-width:980px;margin:42px auto;padding:0 18px}
-  .card{background:linear-gradient(180deg,rgba(139,30,63,0.08),transparent 60%) , var(--card);
-        border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card{
+    background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
+    border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)
+  }
   h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px);letter-spacing:.3px}
   .muted{color:var(--muted)}
   code{background:#0f0b10;border:1px solid var(--line);padding:2px 6px;border-radius:8px}
@@ -28,8 +30,11 @@
   input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.2)}
   .badge{font-size:12px;color:#f1ddea;background:#2a1824;border:1px solid #442034;padding:3px 8px;border-radius:999px}
   ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-  .item a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
-  .item a:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
+  .item{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .item a.main{display:inline-block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
+  .item a.main:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
+  .item a.try{font-size:12px;color:#f6b3cf;text-decoration:none}
+  .item a.try:hover{text-decoration:underline}
   .viewer{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
   .small{font-size:12px;color:var(--muted)}
@@ -58,9 +63,9 @@
 </div>
 
 <script>
-  // 📌 Rutas exactas según tu repo
-  const mdPath = "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos/indice pagina web.md";
+  // 📌 RUTAS (opción A es la que abre en tu sitio)
   const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
+  const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
 
   const $status=document.getElementById("status"),
         $list=document.getElementById("lista"),
@@ -70,33 +75,43 @@
         $note=document.getElementById("note"),
         $back=document.getElementById("back");
 
-  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-  function titleFromTarget(t){return decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));}
+  // Utils
+  const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
 
   async function getLinksFromIndex(){
     const res = await fetch(encodeURI(mdPath));
     if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
     let md = await res.text();
-    md = md.replace(/^---[\\s\\S]*?---\\s*/,"").replace(/^\\{[\\s\\S]*?\\}\\s*/,"");
-    const re = /\\[\\[([^\\]|]+)(?:\\|([^\\]]+))?\\]\\]/g;
-    const items=[];
+    // limpia frontmatter/json si existieran
+    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
+
+    // extrae [[target|Title]] o [[target]]
+    const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
+    const out=[];
     let m;
     while((m=re.exec(md))){
-      let target=m[1].trim().replace(/\\\\+/g,""); // quita \\ si se cuelan
-      let title=(m[2]||titleFromTarget(target)).trim();
-      items.push({target,title});
+      let target = m[1].trim().replace(/\\+/g,""); // quita barras invertidas accidentales
+      let title  = (m[2]||titleFromTarget(target)).trim();
+      if(!target) continue;
+      out.push({target,title});
     }
-    return items;
+    return out;
   }
 
   function renderList(items){
+    if(!items.length){ $status.textContent="⚠️ Índice vacío"; return; }
+    $count.textContent = items.length;
     $list.innerHTML = items.map(r=>{
-      const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
-      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a></li>`;
+      const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
+      return `<li class="item">
+        <a href="#" class="main" data-url="${url}">${escapeHtml(r.title)}</a>
+        <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
+      </li>`;
     }).join("");
-    $count.textContent=items.length;
 
-    $list.querySelectorAll("a").forEach(a=>{
+    // abrir dentro del visor
+    $list.querySelectorAll("a.main").forEach(a=>{
       a.addEventListener("click",ev=>{
         ev.preventDefault();
         openNote(a.dataset.url);
@@ -104,28 +119,63 @@
     });
   }
 
+  // Visor robusto con timeout y mensajes claros
+  function openNote(url){
+    const controller = new AbortController();
+    const t = setTimeout(()=>controller.abort(), 10000); // 10s
+
+    $viewer.hidden=false;
+    $note.innerHTML="<p class='muted'>Cargando…</p>";
+
+    fetch(url,{signal:controller.signal})
+      .then(res=>{ clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text(); })
+      .then(md=>{
+        $note.innerHTML = marked.parse(md) + `<hr><p class="small">Fuente: <code>${url}</code></p>`;
+        $note.scrollIntoView({behavior:"smooth"});
+      })
+      .catch(err=>{
+        clearTimeout(t);
+        $note.innerHTML = `
+          <p class="err">❌ No se pudo abrir el poema.</p>
+          <p class="small">Error: <code>${(err && err.message) || err}</code></p>
+          <p class="small">URL intentada: <code>${url}</code></p>
+          <p class="small"><a href="${url}" target="_blank" rel="noopener">Probar en pestaña nueva</a></p>
+        `;
+      });
+  }
+
+  // Búsqueda en vivo (por título mostrado)
+  function hookSearch(items){
+    $q.addEventListener("input",()=>{
+      const q = $q.value.toLowerCase();
+      const filtered = items.filter(x=>x.title.toLowerCase().includes(q));
+      $count.textContent = filtered.length;
+      $list.innerHTML = filtered.map(r=>{
+        const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
+        return `<li class="item">
+          <a href="#" class="main" data-url="${url}">${escapeHtml(r.title)}</a>
+          <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
+        </li>`;
+      }).join("");
+      $list.querySelectorAll("a.main").forEach(a=>{
+        a.addEventListener("click",ev=>{
+          ev.preventDefault();
+          openNote(a.dataset.url);
+        });
+      });
+    });
+  }
+
   async function main(){
     try{
       $status.textContent="Leyendo índice…";
-      const links=await getLinksFromIndex();
-      if(links.length===0){$status.textContent="⚠️ Índice vacío";return;}
+      const links = await getLinksFromIndex();
       renderList(links);
       $status.textContent="✅ Cargado";
-      $q.addEventListener("input",()=>{
-        const q=$q.value.toLowerCase();
-        renderList(links.filter(r=>r.title.toLowerCase().includes(q)));
-      });
+      hookSearch(links);
     }catch(e){
       $status.textContent="❌ "+String(e);
     }
-  }
-
-  function openNote(url){
-    $viewer.hidden=false;$note.innerHTML="<p class='muted'>Cargando…</p>";
-    fetch(url).then(async res=>{
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const md=await res.text();$note.innerHTML=marked.parse(md);$note.scrollIntoView({behavior:"smooth"});
-    }).catch(err=>{$note.innerHTML=`<p class='err'>❌ ${err.message}</p><p><code>${url}</code></p>`;});
   }
 
   $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
