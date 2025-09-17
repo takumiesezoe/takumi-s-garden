@@ -37,7 +37,7 @@
     <div class="row">
       <input id="q" type="search" placeholder="Buscar título…" />
       <select id="sort">
-        <option value="local">Según esta lista</option>
+        <option value="index">Según índice</option>
         <option value="az">Título A→Z</option>
         <option value="za">Título Z→A</option>
       </select>
@@ -54,24 +54,10 @@
 </div>
 
 <script>
-  // Carpeta real de tus poemas (confirmada)
-  const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
+  // 📌 ruta exacta de tu índice
+  const baseFolder = "Escritos/Canciones-poemas-escritos";
+  const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
 
-  // 🔒 Modo sin índice (evita INDEX_404). Edita esta lista cuando añadas/renombres poemas:
-  const LOCAL_LINKS = [
-    "Siempre","Abuelo","Notificaciones","Inconsciente","Escribo","Falta","Hospital",
-    "Why is it like this","Creencias","Sound","Kintsugi","Ganas","Este chico","Magnifico",
-    "No estoy a la altura","Scars","Body","My big dream","Delirios en la ducha","Pastis","Basura",
-    "Escenarios","Eli x2","Delgado","Porro","Me ha dado miedo","Repito","No es justo","In the neck",
-    "Indicaciones","Alcohol","Sombras","Aphantasia","¿Para que","Duele","Envejecer","Same thing",
-    "No entiendo","Terapeuta virtual","Perdido","Alone","El lastimado","Mi cerebro","Afilado",
-    "Me volvieron a dejar","Random vent","Llanto","Vacio","SHP.com","Casi lo hago","Cronico",
-    "En que piensas","Todo","Disposable","Calladito","Todo mal","Borroso","Waking up or falling down",
-    "Escapulas","En la sien","3 en ralla","Tik tok curse","Creo que tengo tlp","Mala hija","Padres",
-    "Las veces que he despertado","Slit","Irrealidad","Redentor en ruinas","Mi deseo","TEA","Seen","Sex"
-  ];
-
-  // Markdown: respeta saltos de línea para poesía
   marked.setOptions({ breaks:true });
 
   const $status=document.getElementById("status"),
@@ -84,6 +70,7 @@
         $back=document.getElementById("back");
 
   const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
 
   function cleanNote(md, fallbackTitle){
     md = md.replace(/^---[\s\S]*?---\s*/,'').replace(/^\{[\s\S]*?\}\s*/,'').trim();
@@ -93,11 +80,26 @@
     return { title, body: md };
   }
 
+  async function getLinksFromIndex(){
+    const res = await fetch(encodeURI(mdPath));
+    if(!res.ok) throw new Error("INDEX_404");
+    let md = await res.text();
+    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
+    const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
+    const out=[]; let m; let i=0;
+    while((m=re.exec(md))){
+      let target = m[1].trim().replace(/\\+/g,"");
+      let title  = (m[2]||titleFromTarget(target)).trim();
+      if(target) out.push({target,title,index:i++});
+    }
+    return out;
+  }
+
   function sortItems(items, mode){
     const arr = [...items];
     if(mode==="az") arr.sort((a,b)=>a.title.localeCompare(b.title,'es',{sensitivity:'base'}));
     else if(mode==="za") arr.sort((a,b)=>b.title.localeCompare(a.title,'es',{sensitivity:'base'}));
-    // "local": mantiene el orden de esta lista
+    else arr.sort((a,b)=>a.index-b.index); // orden natural del índice
     return arr;
   }
 
@@ -139,18 +141,20 @@
       });
   }
 
-  function main(){
-    $status.textContent = "✅ Usando lista local";
-    const links = LOCAL_LINKS.map((name,i)=>({target:name,title:name,index:i}));
-    renderList(links);
-    $q.addEventListener("input",()=>renderList(links));
-    $sort.addEventListener("change",()=>renderList(links));
+  async function main(){
+    try{
+      $status.textContent="Leyendo índice…";
+      const links = await getLinksFromIndex();
+      $status.textContent="✅ Cargado";
+      renderList(links);
+      $q.addEventListener("input",()=>renderList(links));
+      $sort.addEventListener("change",()=>renderList(links));
+    }catch(e){
+      $status.textContent="❌ "+String(e);
+    }
   }
 
-  document.getElementById("back").addEventListener("click",e=>{
-    e.preventDefault(); $viewer.hidden=true; window.scrollTo({top:0,behavior:"smooth"});
-  });
-
+  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
   main();
 </script>
 </body>
