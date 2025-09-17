@@ -6,38 +6,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root{
-    --bg:#0a0a0a;      /* negro */
-    --card:#131016;    /* negro con tinte granate */
-    --ink:#f5f3f7;     /* texto claro */
-    --muted:#b9a8ba;   /* gris rosado */
-    --accent:#d36ea6;  /* rosado pastel */
-    --garnet:#8b1e3f;  /* granate */
-    --line:#241a24;    /* borde sutil */
+    --bg:#0a0a0a; --card:#131016; --ink:#f5f3f7; --muted:#b9a8ba;
+    --accent:#d36ea6; --garnet:#8b1e3f; --line:#241a24;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   .wrap{max-width:980px;margin:42px auto;padding:0 18px}
-  .card{
-    background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
-    border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)
-  }
-  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px);letter-spacing:.3px}
+  .card{background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
+        border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px)}
   .muted{color:var(--muted)}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
   input[type="search"]{flex:1;min-width:240px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);
     padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
   input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.2)}
   .badge{font-size:12px;color:#f1ddea;background:#2a1824;border:1px solid #442034;padding:3px 8px;border-radius:999px}
-
-  /* Lista */
   ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-  .item{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .item a.main{display:inline-block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
-  .item a.main:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
-  .item a.try{font-size:12px;color:#f6b3cf;text-decoration:none}
-  .item a.try:hover{text-decoration:underline}
-
-  /* Visor del poema */
+  .item a{display:inline-block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
+  .item a:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
   .viewer{margin-top:18px;padding:22px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:14px;text-decoration:none;color:var(--accent)}
   .poem h2{margin:0 0 8px;font-size:clamp(20px,3.5vw,28px)}
@@ -46,7 +32,6 @@
   .poem blockquote{border-left:3px solid var(--garnet);margin:10px 0;padding:6px 12px;color:#f1ddea;background:#160e14;border-radius:8px}
   .small{font-size:12px;color:var(--muted)}
   .err{color:#ff8aa8}
-  hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -54,163 +39,199 @@
 <div class="wrap">
   <div class="card">
     <h1>🗂️ Índice de poemas</h1>
-    <p id="status" class="muted">Cargando…</p>
+    <p id="status" class="muted">Buscando índice…</p>
 
     <div class="row">
       <input id="q" type="search" placeholder="Buscar título…" />
       <span id="count" class="badge">0</span>
     </div>
 
+    <p class="small">Índice: <code id="idxPath">—</code></p>
+    <p class="small">Carpeta base: <code id="baseShow">—</code></p>
+
     <ul id="lista" class="list"></ul>
 
     <div id="viewer" class="viewer" hidden>
       <a href="#" id="back" class="back">← Volver al índice</a>
       <div id="note" class="poem"></div>
+      <p id="dbg" class="small" hidden></p>
     </div>
   </div>
 </div>
 
 <script>
-  // RUTAS confirmadas (opción A que te funciona)
-  const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
-  const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
+  // ===== CONFIG AUTO-DETECCIÓN =====
+  // 1) Nombres posibles del índice
+  const IDX_FILES = [
+    "indice pagina web.md","Indice pagina web.md","índice pagina web.md","Índice pagina web.md",
+    "Escritos_indice_con_enlace.md","index.md","Indice.md"
+  ];
+  // 2) Carpetas probables (incluye la tuya que funcionaba: opción A)
+  const IDX_FOLDERS = [
+    "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos",
+    "notes/Escritos/Canciones poemas escritos",
+    "notes/Escritos/Canciones-poemas-escritos",
+    "notes/Escritos",
+    "notes"
+  ];
 
+  // ===== UI =====
   const $status=document.getElementById("status"),
-        $list=document.getElementById("lista"),
+        $lista=document.getElementById("lista"),
         $count=document.getElementById("count"),
         $q=document.getElementById("q"),
         $viewer=document.getElementById("viewer"),
         $note=document.getElementById("note"),
-        $back=document.getElementById("back");
+        $back=document.getElementById("back"),
+        $idxPath=document.getElementById("idxPath"),
+        $baseShow=document.getElementById("baseShow"),
+        $dbg=document.getElementById("dbg");
 
-  // ❗️Markdown con saltos de línea (ideal poesía)
+  // Markdown con saltos de línea (poesía)
   marked.setOptions({ breaks:true });
 
+  // ===== Utils =====
   const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
+  const rmAccents = s => s.normalize('NFD').replace(/\p{Diacritic}+/gu,'');
+  const stripPunct = s => s.replace(/[¿?¡!:"“”‘’'`.,;()/\\]+/g,'');
+  function deduceBaseFolder(mdPath){ const p=mdPath.split("/"); p.pop(); return p.slice(1).join("/"); } // sin "notes/"
 
-  // Limpia el frontmatter (YAML o JSON) y devuelve {title, body}
-  function cleanNote(md, fallbackTitle){
-    // elimina YAML --- --- y JSON inicial { ... }
-    md = md.replace(/^---[\s\S]*?---\s*/,'')
-           .replace(/^\{[\s\S]*?\}\s*/,'')
-           .trim();
+  async function tryFetch(url){ try{ const r=await fetch(encodeURI(url)); if(!r.ok) return null; return await r.text(); }catch{ return null; } }
 
-    // si hay H1 (# Título) lo usamos como título
-    const m = md.match(/^\s*#\s+(.+?)\s*$/m);
-    const title = m ? m[1].trim() : fallbackTitle;
-
-    // si había H1, quitamos esa línea para no repetir
-    if(m){
-      const start = m.index;
-      const end   = start + m[0].length;
-      md = (md.slice(0,start) + md.slice(end)).trimStart();
+  async function findIndexPath(){
+    for(const folder of IDX_FOLDERS){
+      for(const file of IDX_FILES){
+        const p = `${folder}/${file}`;
+        const txt = await tryFetch(p);
+        if(txt !== null) return { path: p, text: txt };
+      }
     }
-
-    return { title, body: md };
+    return null;
   }
 
-  async function getLinksFromIndex(){
-    const res = await fetch(encodeURI(mdPath));
-    if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
-    let md = await res.text();
+  // Quita YAML/JSON y devuelve {title, body}
+  function cleanNote(md, fallbackTitle){
+    md = md.replace(/^---[\s\S]*?---\s*/,'').replace(/^\{[\s\S]*?\}\s*/,'').trim();
+    const m = md.match(/^\s*#\s+(.+?)\s*$/m);
+    const t = m ? m[1].trim() : fallbackTitle;
+    if(m){ md = (md.slice(0,m.index) + md.slice(m.index + m[0].length)).trimStart(); }
+    return { title: t, body: md };
+  }
 
-    // limpia frontmatter del índice por si acaso
+  function extractLinksFromIndex(md){
+    // limpia frontmatter del índice
     md = md.replace(/^---[\s\S]*?---\s*/,'').replace(/^\{[\s\S]*?\}\s*/,'');
-
     const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
     const out=[]; let m;
     while((m=re.exec(md))){
-      let target = m[1].trim().replace(/\\+/g,""); // quita barras invertidas
+      let target = m[1].trim().replace(/\\+/g,""); // limpia barras invertidas
       let title  = (m[2]||titleFromTarget(target)).trim();
       if(target) out.push({target,title});
     }
     return out;
   }
 
-  function renderList(items){
+  function renderList(items, baseFolder){
     if(!items.length){ $status.textContent="⚠️ Índice vacío"; return; }
     $count.textContent = items.length;
-    $list.innerHTML = items.map(r=>{
+    $lista.innerHTML = items.map(r=>{
       const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
       return `<li class="item">
         <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
       </li>`;
     }).join("");
 
-    $list.querySelectorAll("a.main").forEach(a=>{
+    $lista.querySelectorAll("a.main").forEach(a=>{
       a.addEventListener("click",ev=>{
         ev.preventDefault();
-        openNote(a.dataset.url, a.dataset.title);
+        openNoteProbing(a.dataset.url, a.dataset.title, baseFolder);
       });
     });
-  }
 
-  // Visor con limpieza de frontmatter y título bonito
-  function openNote(url, fallbackTitle){
-    const controller = new AbortController();
-    const t = setTimeout(()=>controller.abort(), 10000); // 10s
-
-    $viewer.hidden=false;
-    $note.innerHTML="<p class='muted'>Cargando…</p>";
-
-    fetch(url,{signal:controller.signal})
-      .then(res=>{ clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text(); })
-      .then(md=>{
-        const {title, body} = cleanNote(md, fallbackTitle);
-        const html = `
-          <h2>${escapeHtml(title)}</h2>
-          <div class="meta"></div>
-          <hr class="sep" />
-          ${marked.parse(body)}
-        `;
-        $note.innerHTML = html;
-        $note.scrollIntoView({behavior:"smooth"});
-      })
-      .catch(err=>{
-        clearTimeout(t);
-        $note.innerHTML = `
-          <p class="err">❌ No se pudo abrir el poema.</p>
-          <p class="small">Error: <code>${(err && err.message) || err}</code></p>
-          <p class="small">URL intentada: <code>${url}</code></p>
-        `;
-      });
-  }
-
-  function hookSearch(items){
+    // búsqueda
     $q.addEventListener("input",()=>{
       const q=$q.value.toLowerCase();
       const filtered=items.filter(x=>x.title.toLowerCase().includes(q));
       $count.textContent=filtered.length;
-      $list.innerHTML = filtered.map(r=>{
-        const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
-        return `<li class="item">
-          <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
-        </li>`;
+      $lista.innerHTML = filtered.map(r=>{
+        const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
+        return `<li class="item"><a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a></li>`;
       }).join("");
-      $list.querySelectorAll("a.main").forEach(a=>{
+      $lista.querySelectorAll("a.main").forEach(a=>{
         a.addEventListener("click",ev=>{
           ev.preventDefault();
-          openNote(a.dataset.url, a.dataset.title);
+          openNoteProbing(a.dataset.url, a.dataset.title, baseFolder);
         });
       });
     });
   }
 
-  async function main(){
-    try{
-      $status.textContent="Leyendo índice…";
-      const links = await getLinksFromIndex();
-      renderList(links);
-      $status.textContent="✅ Cargado";
-      hookSearch(links);
-    }catch(e){
-      $status.textContent="❌ "+String(e);
-    }
+  // Construye variantes de URL para evitar 404 por nombre
+  function buildCandidates(baseFolder, target){
+    target = target.replace(/\\+/g,"");
+    const bare = target.replace(/\.md$/i,'');
+    const withMd = (x)=> `notes/${baseFolder}/${x}.md`;
+    const variants = new Set();
+    variants.add(withMd(bare));
+    variants.add(withMd(bare.toLowerCase()));
+    const noAcc = rmAccents(bare);
+    variants.add(withMd(noAcc));
+    variants.add(withMd(noAcc.toLowerCase()));
+    const noPunct = stripPunct(bare);
+    variants.add(withMd(noPunct));
+    variants.add(withMd(noPunct.toLowerCase()));
+    const hyph=noPunct.replace(/\s+/g,'-'); const unds=noPunct.replace(/\s+/g,'_');
+    variants.add(withMd(hyph)); variants.add(withMd(hyph.toLowerCase()));
+    variants.add(withMd(unds)); variants.add(withMd(unds.toLowerCase()));
+    return [...variants];
   }
 
+  // Abre el poema probando varias rutas (y limpia frontmatter)
+  async function openNoteProbing(initialUrl, fallbackTitle, baseFolder){
+    $viewer.hidden=false; $note.innerHTML="<p class='muted'>Cargando…</p>"; $dbg.hidden=true; $dbg.textContent="";
+    const targetName = decodeURIComponent(initialUrl.split("/").pop().replace(/\.md$/i,""));
+    const candidates = buildCandidates(baseFolder, targetName);
+    candidates.unshift(initialUrl); // prueba primero la calculada
+
+    for(const url of candidates){
+      try{
+        const r = await fetch(encodeURI(url));
+        if(r.ok){
+          const md = await r.text();
+          const {title, body} = cleanNote(md, fallbackTitle);
+          $note.innerHTML = `<h2>${escapeHtml(title)}</h2><div class="meta"></div><hr>${marked.parse(body)}`;
+          $note.scrollIntoView({behavior:"smooth"});
+          return;
+        }
+      }catch{}
+    }
+    // Si ninguna funcionó, muestra ayuda
+    $note.innerHTML = `<p class="err">❌ No se pudo abrir el poema.</p>
+      <p class="small">Revisa mayúsculas/acentos del nombre del archivo en GitHub.</p>`;
+    $dbg.hidden=false;
+    $dbg.textContent = "Probé:\n" + candidates.join("\n");
+  }
+
+  // ===== Arranque =====
+  (async function main(){
+    try{
+      $status.textContent = "🔎 Buscando índice…";
+      const found = await findIndexPath();
+      if(!found){ $status.textContent = "❌ No encontré el índice en rutas comunes."; return; }
+      $idxPath.textContent = found.path;
+      const baseFolder = deduceBaseFolder(found.path);
+      $baseShow.textContent = baseFolder;
+
+      const links = extractLinksFromIndex(found.text);
+      renderList(links, baseFolder);
+      $status.textContent = "✅ Cargado";
+    }catch(e){
+      $status.textContent = "❌ " + String(e);
+    }
+  })();
+
   $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
-  main();
 </script>
 </body>
 </html>
