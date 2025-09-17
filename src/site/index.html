@@ -6,33 +6,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root{
-    --bg:#0a0a0a; --card:#131016; --ink:#f5f3f7; --muted:#b9a8ba;
-    --accent:#d36ea6; --garnet:#8b1e3f; --line:#241a24;
+    --bg:#0a0a0a;      /* negro */
+    --card:#131016;    /* negro con tinte granate */
+    --ink:#f5f3f7;     /* texto claro */
+    --muted:#b9a8ba;   /* gris rosado */
+    --accent:#d36ea6;  /* rosado pastel */
+    --garnet:#8b1e3f;  /* granate */
+    --line:#241a24;    /* borde sutil */
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   .wrap{max-width:980px;margin:42px auto;padding:0 18px}
   .card{
     background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
     border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)
   }
-  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px)}
+  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px);letter-spacing:.3px}
   .muted{color:var(--muted)}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
   input[type="search"]{flex:1;min-width:240px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);
     padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
   input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.2)}
   .badge{font-size:12px;color:#f1ddea;background:#2a1824;border:1px solid #442034;padding:3px 8px;border-radius:999px}
+
+  /* Lista */
   ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   .item{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .item a.main{display:inline-block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
   .item a.main:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
   .item a.try{font-size:12px;color:#f6b3cf;text-decoration:none}
   .item a.try:hover{text-decoration:underline}
-  .viewer{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
-  .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
+
+  /* Visor del poema */
+  .viewer{margin-top:18px;padding:22px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
+  .back{display:inline-block;margin-bottom:14px;text-decoration:none;color:var(--accent)}
+  .poem h2{margin:0 0 8px;font-size:clamp(20px,3.5vw,28px)}
+  .poem .meta{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .poem :where(p,li){margin:0 0 8px}
+  .poem blockquote{border-left:3px solid var(--garnet);margin:10px 0;padding:6px 12px;color:#f1ddea;background:#160e14;border-radius:8px}
   .small{font-size:12px;color:var(--muted)}
   .err{color:#ff8aa8}
+  hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -51,30 +65,15 @@
 
     <div id="viewer" class="viewer" hidden>
       <a href="#" id="back" class="back">← Volver al índice</a>
-      <div id="note"></div>
+      <div id="note" class="poem"></div>
     </div>
   </div>
 </div>
 
 <script>
-  // 📌 Carpeta real donde están tus poemas (confirmada)
+  // RUTAS confirmadas (opción A que te funciona)
   const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
-  // 📌 Índice previsto (ajústalo si lo renombraste)
   const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
-
-  // ✅ Fallback local si el índice no existe (edita esta lista si hace falta)
-  const LOCAL_LINKS = [
-    "Siempre","Abuelo","Notificaciones","Inconsciente","Escribo","Falta","Hospital",
-    "Why is it like this","Creencias","Sound","Kintsugi","Ganas","Este chico","Magnifico",
-    "No estoy a la altura","Scars","Body","My big dream","Delirios en la ducha","Pastis","Basura",
-    "Escenarios","Eli x2","Delgado","Porro","Me ha dado miedo","Repito","No es justo","In the neck",
-    "Indicaciones","Alcohol","Sombras","Aphantasia","¿Para que","Duele","Envejecer","Same thing",
-    "No entiendo","Terapeuta virtual","Perdido","Alone","El lastimado","Mi cerebro","Afilado",
-    "Me volvieron a dejar","Random vent","Llanto","Vacio","SHP.com","Casi lo hago","Cronico",
-    "En que piensas","Todo","Disposable","Calladito","Todo mal","Borroso","Waking up or falling down",
-    "Escapulas","En la sien","3 en ralla","Tik tok curse","Creo que tengo tlp","Mala hija","Padres",
-    "Las veces que he despertado","Slit","Irrealidad","Redentor en ruinas","Mi deseo","TEA","Seen","Sex"
-  ];
 
   const $status=document.getElementById("status"),
         $list=document.getElementById("lista"),
@@ -84,18 +83,45 @@
         $note=document.getElementById("note"),
         $back=document.getElementById("back");
 
+  // ❗️Markdown con saltos de línea (ideal poesía)
+  marked.setOptions({ breaks:true });
+
   const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
 
+  // Limpia el frontmatter (YAML o JSON) y devuelve {title, body}
+  function cleanNote(md, fallbackTitle){
+    // elimina YAML --- --- y JSON inicial { ... }
+    md = md.replace(/^---[\s\S]*?---\s*/,'')
+           .replace(/^\{[\s\S]*?\}\s*/,'')
+           .trim();
+
+    // si hay H1 (# Título) lo usamos como título
+    const m = md.match(/^\s*#\s+(.+?)\s*$/m);
+    const title = m ? m[1].trim() : fallbackTitle;
+
+    // si había H1, quitamos esa línea para no repetir
+    if(m){
+      const start = m.index;
+      const end   = start + m[0].length;
+      md = (md.slice(0,start) + md.slice(end)).trimStart();
+    }
+
+    return { title, body: md };
+  }
+
   async function getLinksFromIndex(){
     const res = await fetch(encodeURI(mdPath));
-    if(!res.ok) throw new Error("INDEX_404");
+    if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
     let md = await res.text();
-    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
+
+    // limpia frontmatter del índice por si acaso
+    md = md.replace(/^---[\s\S]*?---\s*/,'').replace(/^\{[\s\S]*?\}\s*/,'');
+
     const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
     const out=[]; let m;
     while((m=re.exec(md))){
-      let target = m[1].trim().replace(/\\+/g,""); // limpia barras invertidas
+      let target = m[1].trim().replace(/\\+/g,""); // quita barras invertidas
       let title  = (m[2]||titleFromTarget(target)).trim();
       if(target) out.push({target,title});
     }
@@ -108,23 +134,47 @@
     $list.innerHTML = items.map(r=>{
       const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
       return `<li class="item">
-        <a href="#" class="main" data-url="${url}">${escapeHtml(r.title)}</a>
-        <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
+        <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
       </li>`;
     }).join("");
+
     $list.querySelectorAll("a.main").forEach(a=>{
-      a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
+      a.addEventListener("click",ev=>{
+        ev.preventDefault();
+        openNote(a.dataset.url, a.dataset.title);
+      });
     });
   }
 
-  function openNote(url){
+  // Visor con limpieza de frontmatter y título bonito
+  function openNote(url, fallbackTitle){
     const controller = new AbortController();
-    const t = setTimeout(()=>controller.abort(), 10000);
-    $viewer.hidden=false; $note.innerHTML="<p class='muted'>Cargando…</p>";
+    const t = setTimeout(()=>controller.abort(), 10000); // 10s
+
+    $viewer.hidden=false;
+    $note.innerHTML="<p class='muted'>Cargando…</p>";
+
     fetch(url,{signal:controller.signal})
-      .then(res=>{clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text();})
-      .then(md=>{$note.innerHTML=marked.parse(md)+`<hr><p class="small">Fuente: <code>${url}</code></p>`;$note.scrollIntoView({behavior:"smooth"});})
-      .catch(err=>{clearTimeout(t); $note.innerHTML=`<p class="err">❌ No se pudo abrir el poema.</p><p class="small">Error: <code>${(err&&err.message)||err}</code></p><p class="small">URL: <code>${url}</code></p>`;});
+      .then(res=>{ clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text(); })
+      .then(md=>{
+        const {title, body} = cleanNote(md, fallbackTitle);
+        const html = `
+          <h2>${escapeHtml(title)}</h2>
+          <div class="meta"></div>
+          <hr class="sep" />
+          ${marked.parse(body)}
+        `;
+        $note.innerHTML = html;
+        $note.scrollIntoView({behavior:"smooth"});
+      })
+      .catch(err=>{
+        clearTimeout(t);
+        $note.innerHTML = `
+          <p class="err">❌ No se pudo abrir el poema.</p>
+          <p class="small">Error: <code>${(err && err.message) || err}</code></p>
+          <p class="small">URL intentada: <code>${url}</code></p>
+        `;
+      });
   }
 
   function hookSearch(items){
@@ -135,12 +185,14 @@
       $list.innerHTML = filtered.map(r=>{
         const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
         return `<li class="item">
-          <a href="#" class="main" data-url="${url}">${escapeHtml(r.title)}</a>
-          <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
+          <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
         </li>`;
       }).join("");
       $list.querySelectorAll("a.main").forEach(a=>{
-        a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
+        a.addEventListener("click",ev=>{
+          ev.preventDefault();
+          openNote(a.dataset.url, a.dataset.title);
+        });
       });
     });
   }
@@ -148,20 +200,12 @@
   async function main(){
     try{
       $status.textContent="Leyendo índice…";
-      let links = await getLinksFromIndex();
-      $status.textContent="✅ Cargado desde índice";
+      const links = await getLinksFromIndex();
       renderList(links);
+      $status.textContent="✅ Cargado";
       hookSearch(links);
     }catch(e){
-      if(String(e)==="Error: INDEX_404"){
-        // Fallback local
-        const links = LOCAL_LINKS.map(name=>({target:name,title:name}));
-        $status.innerHTML = "⚠️ No encontré el índice. Usando lista local.";
-        renderList(links);
-        hookSearch(links);
-      }else{
-        $status.textContent="❌ "+String(e);
-      }
+      $status.textContent="❌ "+String(e);
     }
   }
 
