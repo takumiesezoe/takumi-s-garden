@@ -5,38 +5,24 @@
 <title>Takumi’s Garden — Índice</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root{
-    --bg:#0a0a0a; --card:#131016; --ink:#f5f3f7; --muted:#b9a8ba;
-    --accent:#d36ea6; --garnet:#8b1e3f; --line:#241a24;
-  }
+  :root{--bg:#0a0a0a;--card:#131016;--ink:#f5f3f7;--muted:#b9a8ba;--accent:#d36ea6;--garnet:#8b1e3f;--line:#241a24}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
   .wrap{max-width:980px;margin:42px auto;padding:0 18px}
-  .card{
-    background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
-    border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)
-  }
+  .card{background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
   h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px)}
   .muted{color:var(--muted)}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
-  input[type="search"]{flex:1;min-width:240px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);
-    padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
-  input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.2)}
+  input[type="search"]{flex:1;min-width:200px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);padding:12px 14px;border-radius:12px;font-size:15px}
+  select{background:#0f0b10;border:1px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:10px}
   .badge{font-size:12px;color:#f1ddea;background:#2a1824;border:1px solid #442034;padding:3px 8px;border-radius:999px}
   ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
   .item{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .item a.main{display:inline-block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0f0b10;text-decoration:none;color:var(--ink)}
   .item a.main:hover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(211,110,166,.18)}
-  .item a.try{font-size:12px;color:#f6b3cf;text-decoration:none}
-  .item a.try:hover{text-decoration:underline}
-
-  /* Visor del poema, bonito y sin “texto raro” */
   .viewer{margin-top:18px;padding:22px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:14px;text-decoration:none;color:var(--accent)}
   .poem h2{margin:0 0 8px;font-size:clamp(20px,3.5vw,28px)}
-  .poem .meta{color:var(--muted);font-size:13px;margin:0 0 14px}
-  .poem :where(p,li){margin:0 0 8px}
-  .poem blockquote{border-left:3px solid var(--garnet);margin:10px 0;padding:6px 12px;color:#f1ddea;background:#160e14;border-radius:8px}
   .small{font-size:12px;color:var(--muted)}
   .err{color:#ff8aa8}
 </style>
@@ -50,6 +36,11 @@
 
     <div class="row">
       <input id="q" type="search" placeholder="Buscar título…" />
+      <select id="sort">
+        <option value="index">Según índice</option>
+        <option value="az">Título A→Z</option>
+        <option value="za">Título Z→A</option>
+      </select>
       <span id="count" class="badge">0</span>
     </div>
 
@@ -63,32 +54,16 @@
 </div>
 
 <script>
-  // 📌 Carpeta real donde están tus poemas (confirmada)
   const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
-  // 📌 Índice previsto (ajústalo si lo renombraste)
   const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
 
-  // ✅ Fallback local si el índice no existe (edita esta lista si hace falta)
-  const LOCAL_LINKS = [
-    "Siempre","Abuelo","Notificaciones","Inconsciente","Escribo","Falta","Hospital",
-    "Why is it like this","Creencias","Sound","Kintsugi","Ganas","Este chico","Magnifico",
-    "No estoy a la altura","Scars","Body","My big dream","Delirios en la ducha","Pastis","Basura",
-    "Escenarios","Eli x2","Delgado","Porro","Me ha dado miedo","Repito","No es justo","In the neck",
-    "Indicaciones","Alcohol","Sombras","Aphantasia","¿Para que","Duele","Envejecer","Same thing",
-    "No entiendo","Terapeuta virtual","Perdido","Alone","El lastimado","Mi cerebro","Afilado",
-    "Me volvieron a dejar","Random vent","Llanto","Vacio","SHP.com","Casi lo hago","Cronico",
-    "En que piensas","Todo","Disposable","Calladito","Todo mal","Borroso","Waking up or falling down",
-    "Escapulas","En la sien","3 en ralla","Tik tok curse","Creo que tengo tlp","Mala hija","Padres",
-    "Las veces que he despertado","Slit","Irrealidad","Redentor en ruinas","Mi deseo","TEA","Seen","Sex"
-  ];
-
-  // —— Ajustes de Markdown: respeta saltos de línea para poesía
-  marked.setOptions({ breaks: true });
+  marked.setOptions({ breaks:true });
 
   const $status=document.getElementById("status"),
         $list=document.getElementById("lista"),
         $count=document.getElementById("count"),
         $q=document.getElementById("q"),
+        $sort=document.getElementById("sort"),
         $viewer=document.getElementById("viewer"),
         $note=document.getElementById("note"),
         $back=document.getElementById("back");
@@ -96,19 +71,11 @@
   const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
 
-  // Quita frontmatter YAML/JSON del poema y saca un título limpio
   function cleanNote(md, fallbackTitle){
-    // borra YAML --- ---  y JSON inicial { ... }
-    md = md.replace(/^---[\s\S]*?---\s*/,'')
-           .replace(/^\{[\s\S]*?\}\s*/,'')
-           .trim();
-    // si hay H1 (# Título) úsalo como título y quítalo del cuerpo
+    md = md.replace(/^---[\s\S]*?---\s*/,'').replace(/^\{[\s\S]*?\}\s*/,'').trim();
     const m = md.match(/^\s*#\s+(.+?)\s*$/m);
     const title = m ? m[1].trim() : fallbackTitle;
-    if(m){
-      const start = m.index, end = start + m[0].length;
-      md = (md.slice(0,start) + md.slice(end)).trimStart();
-    }
+    if(m){ md = (md.slice(0,m.index) + md.slice(m.index + m[0].length)).trimStart(); }
     return { title, body: md };
   }
 
@@ -116,29 +83,35 @@
     const res = await fetch(encodeURI(mdPath));
     if(!res.ok) throw new Error("INDEX_404");
     let md = await res.text();
-    // limpia frontmatter del índice si lo hubiera
     md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
     const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
-    const out=[]; let m;
+    const out=[]; let m; let i=0;
     while((m=re.exec(md))){
-      let target = m[1].trim().replace(/\\+/g,""); // limpia barras invertidas accidentales
+      let target = m[1].trim().replace(/\\+/g,"");
       let title  = (m[2]||titleFromTarget(target)).trim();
-      if(target) out.push({target,title});
+      if(target) out.push({target,title,index:i++});
     }
     return out;
   }
 
+  function sortItems(items, mode){
+    const arr = [...items];
+    if(mode==="az") arr.sort((a,b)=>a.title.localeCompare(b.title,'es',{sensitivity:'base'}));
+    else if(mode==="za") arr.sort((a,b)=>b.title.localeCompare(a.title,'es',{sensitivity:'base'}));
+    else arr.sort((a,b)=>a.index-b.index); // según el orden del índice
+    return arr;
+  }
+
   function renderList(items){
-    if(!items.length){ $status.textContent="⚠️ Índice vacío"; return; }
     $count.textContent = items.length;
-    $list.innerHTML = items.map(r=>{
+    const mode = $sort.value;
+    const toShow = sortItems(items, mode).filter(x=>x.title.toLowerCase().includes($q.value.toLowerCase()));
+    $list.innerHTML = toShow.map(r=>{
       const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
       return `<li class="item">
         <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
-        <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
       </li>`;
     }).join("");
-
     $list.querySelectorAll("a.main").forEach(a=>{
       a.addEventListener("click",ev=>{
         ev.preventDefault();
@@ -147,25 +120,15 @@
     });
   }
 
-  // Visor del poema (con timeout y limpieza de “texto raro”)
   function openNote(url, fallbackTitle){
     const controller = new AbortController();
     const t = setTimeout(()=>controller.abort(), 10000);
-
-    $viewer.hidden=false; 
-    $note.innerHTML="<p class='muted'>Cargando…</p>";
-
+    $viewer.hidden=false; $note.innerHTML="<p class='muted'>Cargando…</p>";
     fetch(url,{signal:controller.signal})
       .then(res=>{clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text();})
       .then(md=>{
         const {title, body} = cleanNote(md, fallbackTitle);
-        $note.innerHTML = `
-          <h2>${escapeHtml(title)}</h2>
-          <div class="meta"></div>
-          <hr />
-          ${marked.parse(body)}
-          <hr />
-          <p class="small">Fuente: <code>${url}</code></p>`;
+        $note.innerHTML = `<h2>${escapeHtml(title)}</h2><hr />${marked.parse(body)}`;
         $note.scrollIntoView({behavior:"smooth"});
       })
       .catch(err=>{
@@ -176,50 +139,21 @@
       });
   }
 
-  function hookSearch(items){
-    $q.addEventListener("input",()=>{
-      const q=$q.value.toLowerCase();
-      const filtered=items.filter(x=>x.title.toLowerCase().includes(q));
-      $count.textContent=filtered.length;
-      $list.innerHTML = filtered.map(r=>{
-        const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
-        return `<li class="item">
-          <a href="#" class="main" data-url="${url}" data-title="${escapeHtml(r.title)}">${escapeHtml(r.title)}</a>
-          <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
-        </li>`;
-      }).join("");
-      $list.querySelectorAll("a.main").forEach(a=>{
-        a.addEventListener("click",ev=>{
-          ev.preventDefault(); openNote(a.dataset.url, a.dataset.title);
-        });
-      });
-    });
-  }
-
   async function main(){
     try{
       $status.textContent="Leyendo índice…";
-      let links = await getLinksFromIndex();
-      $status.textContent="✅ Cargado desde índice";
+      const links = await getLinksFromIndex();
+      $status.textContent="✅ Cargado";
+      // render inicial y eventos de filtro/orden
       renderList(links);
-      hookSearch(links);
+      $q.addEventListener("input",()=>renderList(links));
+      $sort.addEventListener("change",()=>renderList(links));
     }catch(e){
-      if(String(e)==="Error: INDEX_404"){
-        // Fallback local
-        const links = LOCAL_LINKS.map(name=>({target:name,title:name}));
-        $status.innerHTML = "⚠️ No encontré el índice. Usando lista local.";
-        renderList(links);
-        hookSearch(links);
-      }else{
-        $status.textContent="❌ "+String(e);
-      }
+      $status.textContent="❌ "+String(e);
     }
   }
 
-  document.getElementById("back").addEventListener("click",e=>{
-    e.preventDefault(); $viewer.hidden=true; window.scrollTo({top:0,behavior:"smooth"});
-  });
-
+  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
   main();
 </script>
 </body>
