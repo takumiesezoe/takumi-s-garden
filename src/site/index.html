@@ -6,13 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root{
-    --bg:#0a0a0a;           /* negro */
-    --card:#131016;         /* negro con tinte granate */
-    --ink:#f5f3f7;          /* texto claro */
-    --muted:#b9a8ba;        /* gris rosado */
-    --accent:#d36ea6;       /* rosado pastel */
-    --garnet:#8b1e3f;       /* granate */
-    --line:#241a24;         /* borde sutil */
+    --bg:#0a0a0a;
+    --card:#131016;
+    --ink:#f5f3f7;
+    --muted:#b9a8ba;
+    --accent:#d36ea6;
+    --garnet:#8b1e3f;
+    --line:#241a24;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -33,9 +33,6 @@
   .viewer{margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#0f0b10}
   .back{display:inline-block;margin-bottom:10px;text-decoration:none;color:var(--accent)}
   .small{font-size:12px;color:var(--muted)}
-  hr{border:none;border-top:1px solid var(--line);margin:14px 0}
-  details{margin-top:10px}
-  summary{cursor:pointer;color:#f6b3cf}
   .err{color:#ff8aa8}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -44,176 +41,95 @@
 <div class="wrap">
   <div class="card">
     <h1>🗂️ Índice de poemas</h1>
-    <p id="status" class="muted">Buscando índice…</p>
+    <p id="status" class="muted">Cargando…</p>
 
     <div class="row">
       <input id="q" type="search" placeholder="Buscar título…" />
       <span id="count" class="badge">0</span>
     </div>
 
-    <p class="small">Índice encontrado en: <code id="chosenPath">—</code></p>
-    <p class="small">Carpeta base detectada: <code id="baseFolderShow">—</code></p>
-
     <ul id="lista" class="list"></ul>
 
     <div id="viewer" class="viewer" hidden>
       <a href="#" id="back" class="back">← Volver al índice</a>
       <div id="note"></div>
-      <details id="dbg" hidden>
-        <summary>Ver URLs probadas</summary>
-        <div id="tried"></div>
-      </details>
     </div>
   </div>
 </div>
 
 <script>
-  const $status = document.getElementById("status");
-  const $lista  = document.getElementById("lista");
-  const $viewer = document.getElementById("viewer");
-  const $note   = document.getElementById("note");
-  const $q      = document.getElementById("q");
-  const $count  = document.getElementById("count");
-  const $chosen = document.getElementById("chosenPath");
-  const $baseShow = document.getElementById("baseFolderShow");
-  const $back   = document.getElementById("back");
-  const $dbg    = document.getElementById("dbg");
-  const $tried  = document.getElementById("tried");
+  // 📌 Rutas exactas según tu repo
+  const mdPath = "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos/indice pagina web.md";
+  const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
 
-  const fileNames = [
-    "indice pagina web.md","Indice pagina web.md","índice pagina web.md","Índice pagina web.md",
-    "Escritos_indice_con_enlace.md","index.md","Indice.md"
-  ];
-  const folders = [
-    "notes/Escritos/Canciones-poemas-escritos/Canciones poemas escritos",
-    "notes/Escritos/canciones poemas escritos",
-    "notes/Escritos/Canciones poemas escritos",
-    "notes/Escritos/Canciones-poemas-escritos",
-    "notes/Escritos",
-    "notes"
-  ];
-  const candidates=[]; for (const f of folders){ for(const n of fileNames){ candidates.push(`${f}/${n}`); } }
+  const $status=document.getElementById("status"),
+        $list=document.getElementById("lista"),
+        $count=document.getElementById("count"),
+        $q=document.getElementById("q"),
+        $viewer=document.getElementById("viewer"),
+        $note=document.getElementById("note"),
+        $back=document.getElementById("back");
 
   function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
   function titleFromTarget(t){return decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));}
-  const rmAccents = s => s.normalize('NFD').replace(/\p{Diacritic}+/gu,'');
-  const stripPunct = s => s.replace(/[¿?¡!:"“”‘’'`.,;()/\\]+/g,'');
-  function deduceBaseFolder(mdPath){ const p=mdPath.split("/"); p.pop(); return p.slice(1).join("/"); }
-  async function tryFetch(url){ try{ const r=await fetch(encodeURI(url)); if(!r.ok) return null; return await r.text(); }catch{ return null; } }
 
-  async function findIndex(){
-    for(const p of candidates){ const t = await tryFetch(p); if(t!==null) return {path:p,text:t}; }
-    return null;
-  }
-
-  function extractLinks(md){
-    md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-    const bullet = [...md.matchAll(/^\s*[-*+]\s+\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/mg)];
-    if(bullet.length){
-      return bullet.map(m=>{
-        let target=m[1].trim().replace(/\\+/g,""); // quita \\
-        let title=(m[2]||titleFromTarget(target)).trim();
-        return {target,title};
-      });
-    }
-    const all = [...md.matchAll(/\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g)];
-    return all.map(m=>{
-      let target=m[1].trim().replace(/\\+/g,""); // quita \\
+  async function getLinksFromIndex(){
+    const res = await fetch(encodeURI(mdPath));
+    if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
+    let md = await res.text();
+    md = md.replace(/^---[\\s\\S]*?---\\s*/,"").replace(/^\\{[\\s\\S]*?\\}\\s*/,"");
+    const re = /\\[\\[([^\\]|]+)(?:\\|([^\\]]+))?\\]\\]/g;
+    const items=[];
+    let m;
+    while((m=re.exec(md))){
+      let target=m[1].trim().replace(/\\\\+/g,""); // quita \\ si se cuelan
       let title=(m[2]||titleFromTarget(target)).trim();
-      return {target,title};
-    });
+      items.push({target,title});
+    }
+    return items;
   }
 
-  function renderList(items, baseFolder){
-    if(!items.length){ $status.innerHTML = "<span class='muted'>⚠️ No encontré [[links]] en el índice.</span>"; return; }
-    $status.textContent = "✅ Cargado";
-    $count.textContent = items.length;
-    $lista.innerHTML = items.map(it=>{
-      return `<li class="item"><a href="#" data-target="${escapeHtml(it.target)}" data-base="${escapeHtml(baseFolder)}">${escapeHtml(it.title)}</a></li>`;
+  function renderList(items){
+    $list.innerHTML = items.map(r=>{
+      const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
+      return `<li class="item"><a href="#" data-url="${url}">${escapeHtml(r.title)}</a></li>`;
     }).join("");
-    $lista.querySelectorAll("a").forEach(a=>{
-      a.addEventListener("click", ev=>{
+    $count.textContent=items.length;
+
+    $list.querySelectorAll("a").forEach(a=>{
+      a.addEventListener("click",ev=>{
         ev.preventDefault();
-        openNoteProbing(a.dataset.base, a.dataset.target);
+        openNote(a.dataset.url);
       });
     });
-    $q.oninput = ()=>{
-      const q = $q.value.toLowerCase();
-      const filtered = items.filter(x=>x.title.toLowerCase().includes(q));
-      $count.textContent = filtered.length;
-      $lista.innerHTML = filtered.map(it=>{
-        return `<li class="item"><a href="#" data-target="${escapeHtml(it.target)}" data-base="${escapeHtml(baseFolder)}">${escapeHtml(it.title)}</a></li>`;
-      }).join("");
-      $lista.querySelectorAll("a").forEach(a=>{
-        a.addEventListener("click", ev=>{
-          ev.preventDefault();
-          openNoteProbing(a.dataset.base, a.dataset.target);
-        });
+  }
+
+  async function main(){
+    try{
+      $status.textContent="Leyendo índice…";
+      const links=await getLinksFromIndex();
+      if(links.length===0){$status.textContent="⚠️ Índice vacío";return;}
+      renderList(links);
+      $status.textContent="✅ Cargado";
+      $q.addEventListener("input",()=>{
+        const q=$q.value.toLowerCase();
+        renderList(links.filter(r=>r.title.toLowerCase().includes(q)));
       });
-    };
+    }catch(e){
+      $status.textContent="❌ "+String(e);
+    }
   }
 
-  function buildCandidates(baseFolder, target){
-    target = target.replace(/\\+/g,""); // limpia \\
-    const bare = target.replace(/\.md$/i,'');
-    const withMd = (x)=> `notes/${baseFolder}/${x}.md`;
-    const variants = new Set();
-    variants.add(withMd(bare));
-    variants.add(withMd(bare.toLowerCase()));
-    const noAcc = rmAccents(bare);
-    variants.add(withMd(noAcc));
-    variants.add(withMd(noAcc.toLowerCase()));
-    const noPunct = stripPunct(bare);
-    variants.add(withMd(noPunct));
-    variants.add(withMd(noPunct.toLowerCase()));
-    const hyph=noPunct.replace(/\s+/g,'-'); const unds=noPunct.replace(/\s+/g,'_');
-    variants.add(withMd(hyph)); variants.add(withMd(unds));
-    const parent = baseFolder.split('/').slice(0,-1).join('/');
-    if(parent){
-      variants.add(`notes/${parent}/${bare}.md`);
-      variants.add(`notes/${parent}/${bare.toLowerCase()}.md`);
-    }
-    return [...variants];
+  function openNote(url){
+    $viewer.hidden=false;$note.innerHTML="<p class='muted'>Cargando…</p>";
+    fetch(url).then(async res=>{
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const md=await res.text();$note.innerHTML=marked.parse(md);$note.scrollIntoView({behavior:"smooth"});
+    }).catch(err=>{$note.innerHTML=`<p class='err'>❌ ${err.message}</p><p><code>${url}</code></p>`;});
   }
 
-  async function openNoteProbing(baseFolder, target){
-    $viewer.hidden = false;
-    $note.innerHTML = "<p class='muted'>Buscando el poema…</p>";
-    $dbg.hidden = true; $tried.innerHTML = "";
-    const candidates = buildCandidates(baseFolder, target);
-    const tried = [];
-    for(const url of candidates){
-      tried.push(url);
-      try{
-        const res = await fetch(encodeURI(url));
-        if(res.ok){
-          const md = await res.text();
-          $note.innerHTML = marked.parse(md);
-          $note.scrollIntoView({behavior:"smooth"});
-          return;
-        }
-      }catch(_){}
-    }
-    $note.innerHTML = `<p class="err">❌ No pude abrir <b>${escapeHtml(target)}</b>.</p><p class="muted">Revisa el nombre exacto en GitHub.</p>`;
-    $dbg.hidden = false;
-    $tried.innerHTML = "<ol>" + tried.map(u=>`<li><code>${escapeHtml(u)}</code></li>`).join("") + "</ol>";
-  }
-
-  (async function main(){
-    $status.textContent = "🔎 Buscando índice…";
-    const found = await findIndex();
-    if(!found){
-      $status.innerHTML = "❌ No encontré índice en rutas comunes.<br><span class='small'>Crea un archivo <code>indice pagina web.md</code> en <code>src/site/notes/…</code>.</span>";
-      return;
-    }
-    $chosen.textContent = found.path;
-    const baseFolder = deduceBaseFolder(found.path);
-    $baseShow.textContent = baseFolder;
-    const links = extractLinks(found.text);
-    renderList(links, baseFolder);
-  })();
-
-  $back.addEventListener("click",(e)=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
+  $back.addEventListener("click",e=>{e.preventDefault();$viewer.hidden=true;window.scrollTo({top:0,behavior:"smooth"});});
+  main();
 </script>
 </body>
 </html>
