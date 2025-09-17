@@ -6,13 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
   :root{
-    --bg:#0a0a0a;      /* negro */
-    --card:#131016;    /* negro con tinte granate */
-    --ink:#f5f3f7;     /* texto claro */
-    --muted:#b9a8ba;   /* gris rosado */
-    --accent:#d36ea6;  /* rosado pastel */
-    --garnet:#8b1e3f;  /* granate */
-    --line:#241a24;    /* borde sutil */
+    --bg:#0a0a0a; --card:#131016; --ink:#f5f3f7; --muted:#b9a8ba;
+    --accent:#d36ea6; --garnet:#8b1e3f; --line:#241a24;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -21,9 +16,8 @@
     background:linear-gradient(180deg,rgba(139,30,63,.08),transparent 60%),var(--card);
     border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)
   }
-  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px);letter-spacing:.3px}
+  h1{margin:0 0 6px;font-size:clamp(22px,4vw,34px)}
   .muted{color:var(--muted)}
-  code{background:#0f0b10;border:1px solid var(--line);padding:2px 6px;border-radius:8px}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 14px}
   input[type="search"]{flex:1;min-width:240px;background:#0f0b10;border:1px solid var(--line);color:var(--ink);
     padding:12px 14px;border-radius:12px;font-size:15px;outline:none}
@@ -63,9 +57,24 @@
 </div>
 
 <script>
-  // 📌 RUTAS (opción A es la que abre en tu sitio)
+  // 📌 Carpeta real donde están tus poemas (confirmada)
   const baseFolder = "Escritos/Canciones-poemas-escritos/Canciones poemas escritos";
+  // 📌 Índice previsto (ajústalo si lo renombraste)
   const mdPath     = `notes/${baseFolder}/indice pagina web.md`;
+
+  // ✅ Fallback local si el índice no existe (edita esta lista si hace falta)
+  const LOCAL_LINKS = [
+    "Siempre","Abuelo","Notificaciones","Inconsciente","Escribo","Falta","Hospital",
+    "Why is it like this","Creencias","Sound","Kintsugi","Ganas","Este chico","Magnifico",
+    "No estoy a la altura","Scars","Body","My big dream","Delirios en la ducha","Pastis","Basura",
+    "Escenarios","Eli x2","Delgado","Porro","Me ha dado miedo","Repito","No es justo","In the neck",
+    "Indicaciones","Alcohol","Sombras","Aphantasia","¿Para que","Duele","Envejecer","Same thing",
+    "No entiendo","Terapeuta virtual","Perdido","Alone","El lastimado","Mi cerebro","Afilado",
+    "Me volvieron a dejar","Random vent","Llanto","Vacio","SHP.com","Casi lo hago","Cronico",
+    "En que piensas","Todo","Disposable","Calladito","Todo mal","Borroso","Waking up or falling down",
+    "Escapulas","En la sien","3 en ralla","Tik tok curse","Creo que tengo tlp","Mala hija","Padres",
+    "Las veces que he despertado","Slit","Irrealidad","Redentor en ruinas","Mi deseo","TEA","Seen","Sex"
+  ];
 
   const $status=document.getElementById("status"),
         $list=document.getElementById("lista"),
@@ -75,26 +84,20 @@
         $note=document.getElementById("note"),
         $back=document.getElementById("back");
 
-  // Utils
   const escapeHtml = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const titleFromTarget = t => decodeURIComponent(t.split('/').pop().replace(/\.md$/i,''));
 
   async function getLinksFromIndex(){
     const res = await fetch(encodeURI(mdPath));
-    if(!res.ok) throw new Error("No se pudo abrir el índice ("+res.status+")");
+    if(!res.ok) throw new Error("INDEX_404");
     let md = await res.text();
-    // limpia frontmatter/json si existieran
     md = md.replace(/^---[\s\S]*?---\s*/,"").replace(/^\{[\s\S]*?\}\s*/,"");
-
-    // extrae [[target|Title]] o [[target]]
     const re = /\[\[([^\]\|]+)(?:\|([^\]]+))?\]\]/g;
-    const out=[];
-    let m;
+    const out=[]; let m;
     while((m=re.exec(md))){
-      let target = m[1].trim().replace(/\\+/g,""); // quita barras invertidas accidentales
+      let target = m[1].trim().replace(/\\+/g,""); // limpia barras invertidas
       let title  = (m[2]||titleFromTarget(target)).trim();
-      if(!target) continue;
-      out.push({target,title});
+      if(target) out.push({target,title});
     }
     return out;
   }
@@ -109,59 +112,35 @@
         <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
       </li>`;
     }).join("");
-
-    // abrir dentro del visor
     $list.querySelectorAll("a.main").forEach(a=>{
-      a.addEventListener("click",ev=>{
-        ev.preventDefault();
-        openNote(a.dataset.url);
-      });
+      a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
     });
   }
 
-  // Visor robusto con timeout y mensajes claros
   function openNote(url){
     const controller = new AbortController();
-    const t = setTimeout(()=>controller.abort(), 10000); // 10s
-
-    $viewer.hidden=false;
-    $note.innerHTML="<p class='muted'>Cargando…</p>";
-
+    const t = setTimeout(()=>controller.abort(), 10000);
+    $viewer.hidden=false; $note.innerHTML="<p class='muted'>Cargando…</p>";
     fetch(url,{signal:controller.signal})
-      .then(res=>{ clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text(); })
-      .then(md=>{
-        $note.innerHTML = marked.parse(md) + `<hr><p class="small">Fuente: <code>${url}</code></p>`;
-        $note.scrollIntoView({behavior:"smooth"});
-      })
-      .catch(err=>{
-        clearTimeout(t);
-        $note.innerHTML = `
-          <p class="err">❌ No se pudo abrir el poema.</p>
-          <p class="small">Error: <code>${(err && err.message) || err}</code></p>
-          <p class="small">URL intentada: <code>${url}</code></p>
-          <p class="small"><a href="${url}" target="_blank" rel="noopener">Probar en pestaña nueva</a></p>
-        `;
-      });
+      .then(res=>{clearTimeout(t); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.text();})
+      .then(md=>{$note.innerHTML=marked.parse(md)+`<hr><p class="small">Fuente: <code>${url}</code></p>`;$note.scrollIntoView({behavior:"smooth"});})
+      .catch(err=>{clearTimeout(t); $note.innerHTML=`<p class="err">❌ No se pudo abrir el poema.</p><p class="small">Error: <code>${(err&&err.message)||err}</code></p><p class="small">URL: <code>${url}</code></p>`;});
   }
 
-  // Búsqueda en vivo (por título mostrado)
   function hookSearch(items){
     $q.addEventListener("input",()=>{
-      const q = $q.value.toLowerCase();
-      const filtered = items.filter(x=>x.title.toLowerCase().includes(q));
-      $count.textContent = filtered.length;
+      const q=$q.value.toLowerCase();
+      const filtered=items.filter(x=>x.title.toLowerCase().includes(q));
+      $count.textContent=filtered.length;
       $list.innerHTML = filtered.map(r=>{
-        const url = encodeURI(`notes/${baseFolder}/${r.target}.md`);
+        const url=encodeURI(`notes/${baseFolder}/${r.target}.md`);
         return `<li class="item">
           <a href="#" class="main" data-url="${url}">${escapeHtml(r.title)}</a>
           <a class="try" href="${url}" target="_blank" rel="noopener">probar directo</a>
         </li>`;
       }).join("");
       $list.querySelectorAll("a.main").forEach(a=>{
-        a.addEventListener("click",ev=>{
-          ev.preventDefault();
-          openNote(a.dataset.url);
-        });
+        a.addEventListener("click",ev=>{ev.preventDefault();openNote(a.dataset.url);});
       });
     });
   }
@@ -169,12 +148,20 @@
   async function main(){
     try{
       $status.textContent="Leyendo índice…";
-      const links = await getLinksFromIndex();
+      let links = await getLinksFromIndex();
+      $status.textContent="✅ Cargado desde índice";
       renderList(links);
-      $status.textContent="✅ Cargado";
       hookSearch(links);
     }catch(e){
-      $status.textContent="❌ "+String(e);
+      if(String(e)==="Error: INDEX_404"){
+        // Fallback local
+        const links = LOCAL_LINKS.map(name=>({target:name,title:name}));
+        $status.innerHTML = "⚠️ No encontré el índice. Usando lista local.";
+        renderList(links);
+        hookSearch(links);
+      }else{
+        $status.textContent="❌ "+String(e);
+      }
     }
   }
 
