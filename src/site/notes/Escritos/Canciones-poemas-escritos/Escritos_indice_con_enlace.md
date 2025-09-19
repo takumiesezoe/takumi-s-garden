@@ -4,6 +4,8 @@
 
 | Nº | Idioma  | Fecha de creación             | Título                                                                                                                       |
 | -- | ------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| \- | Spanish | 8:11 PM - September 18, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/A nadie, nunca\|A nadie, nunca]]                           |
+| \- | \-      | 10:20 PM - September 17, 2025 | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Miradas\|Miradas]]                                         |
 | \- | Spanish | 4:41 PM - September 16, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Listas\|Listas]]                                           |
 | \- | Spanish | 6:44 PM - September 15, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Siempre\|Siempre]]                                         |
 | \- | Spanish | 11:08 PM - September 14, 2025 | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Notificaciones\|Notificaciones]]                           |
@@ -72,12 +74,12 @@
 | \- | Spanish | 5:29 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Padres\|Padres]]                                           |
 | \- | Spanish | 5:26 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Las veces que he despertado\|Las veces que he despertado]] |
 | \- | English | 5:25 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Slit\|Slit]]                                               |
-| \- | Spanish | 5:23 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Irrealidad\|Irrealidad]]                                   |
 | \- | Spanish | 5:23 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Redentor en ruinas\|Redentor en ruinas]]                   |
-| \- | Spanish | 5:22 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Mi deseo\|Mi deseo]]                                       |
+| \- | Spanish | 5:23 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Irrealidad\|Irrealidad]]                                   |
 | \- | Spanish | 5:22 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/TEA\|TEA]]                                                 |
-| \- | English | 5:21 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Seen\|Seen]]                                               |
+| \- | Spanish | 5:22 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Mi deseo\|Mi deseo]]                                       |
 | \- | Spanish | 5:21 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Sex\|Sex]]                                                 |
+| \- | English | 5:21 PM - June 03, 2025       | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Seen\|Seen]]                                               |
 
 { .block-language-dataview}
 
