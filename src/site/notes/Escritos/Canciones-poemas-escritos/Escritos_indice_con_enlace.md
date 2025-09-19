@@ -5,7 +5,7 @@
 | Nº | Idioma  | Fecha de creación             | Título                                                                                                                       |
 | -- | ------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | \- | Spanish | 8:11 PM - September 18, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/A nadie, nunca\|A nadie, nunca]]                           |
-| \- | \-      | 10:20 PM - September 17, 2025 | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Miradas\|Miradas]]                                         |
+| \- | Spanish | 10:20 PM - September 17, 2025 | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Miradas\|Miradas]]                                         |
 | \- | Spanish | 4:41 PM - September 16, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Listas\|Listas]]                                           |
 | \- | Spanish | 6:44 PM - September 15, 2025  | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Siempre\|Siempre]]                                         |
 | \- | Spanish | 11:08 PM - September 14, 2025 | [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Notificaciones\|Notificaciones]]                           |
