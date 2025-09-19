@@ -1,0 +1,18 @@
+{
+  "obsidian-table-to-csv-exporter:obsidian-table-to-csv-exporter": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "9"
+    }
+  ],
+  "digitalgarden:publish-multiple-notes": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "X"
+    }
+  ]
+}
