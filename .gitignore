@@ -2,3 +2,6 @@
 .obsidian/plugins/digitalgarden/
 .obsidian/
 .obsidian/
+.obsidian/
+.DS_Store
+Thumbs.db
