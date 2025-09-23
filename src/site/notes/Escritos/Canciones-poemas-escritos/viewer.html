@@ -10,28 +10,30 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-  // Lee ?file=... de la URL
   const params = new URLSearchParams(location.search);
-  const file = params.get('file');
+  const raw = params.get('file');               // p.ej. "Mi deseo.md"
   const titleEl = document.getElementById('title');
   const contentEl = document.getElementById('content');
 
-  if (!file) {
+  if (!raw) {
     titleEl.textContent = 'Sin archivo';
     contentEl.textContent = 'Falta el parámetro ?file=...';
   } else {
-    titleEl.textContent = decodeURIComponent(file.replace(/\.md$/i,''));
-    // Carga el .md de la misma carpeta
-    fetch(decodeURIComponent(file))
+    // Asegura extensión .md y codifica la URL para fetch
+    const path = raw.endsWith('.md') ? raw : raw + '.md';
+    titleEl.textContent = path.replace(/\.md$/i,'');
+    const url = encodeURI(path);  // <-- clave: codificar espacios, ¿, etc.
+
+    fetch(url)
       .then(r => {
-        if (!r.ok) throw new Error('No se pudo cargar el archivo');
+        if (!r.ok) throw new Error('No se pudo cargar el archivo (' + r.status + ')');
         return r.text();
       })
       .then(md => {
         contentEl.innerHTML = marked.parse(md);
       })
       .catch(err => {
-        contentEl.innerHTML = '<p style="color:#c00">Error: ' + err.message + '</p>';
+        contentEl.innerHTML = '<p style="color:#c00">Error: ' + err.message + '</p><p>Intenté cargar: <code>' + url + '</code></p>';
       });
   }
 </script>
