@@ -1,5 +1,148 @@
 <!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Takumi’s Garden</title>
-<h1>Takumi’s Garden</h1>
-<p><a href="notes/Escritos/Canciones-poemas-escritos/">Entrar: Canciones, poemas y escritos</a></p>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  main.container {
+    padding-block: 3.5rem 4.5rem;
+    max-width: 62rem;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    margin-inline: auto;
+    max-width: 42rem;
+  }
+
+  .hero .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .hero .actions a[role="button"] {
+    min-width: 13rem;
+  }
+
+  section.poem-index {
+    margin-top: 1rem;
+  }
+
+  section.poem-index h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  #status-root {
+    color: var(--muted-color, #666);
+  }
+
+  ul#poem-list-root {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    columns: 1;
+    column-gap: 2.5rem;
+  }
+
+  @media (min-width: 56rem) {
+    ul#poem-list-root {
+      columns: 2;
+    }
+  }
+
+  ul#poem-list-root li {
+    break-inside: avoid;
+    margin-bottom: 0.4rem;
+  }
+
+  ul#poem-list-root li a {
+    text-decoration: none;
+  }
+
+  ul#poem-list-root li a:hover {
+    text-decoration: underline;
+  }
+
+  ul#poem-list-root li.missing {
+    color: var(--del-color, #c02c2c);
+  }
+
+  ul#poem-list-root li.missing span {
+    font-size: 0.9em;
+    margin-left: 0.35rem;
+    color: inherit;
+  }
+
+  ul#poem-list-root li.more-items {
+    margin-top: 0.75rem;
+  }
+
+  footer {
+    margin-top: 4rem;
+    text-align: center;
+    color: var(--muted-color, #666);
+  }
+</style>
+<main class="container">
+  <section class="hero">
+    <h1>Takumi’s Garden</h1>
+    <p>
+      Canciones, poemas y escritos seleccionados. Explora el índice completo con el visor de
+      Pico CSS para leer cada pieza en modo claro u oscuro según tu dispositivo.
+    </p>
+    <div class="actions">
+      <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html" role="button" class="contrast">Abrir el visor</a>
+      <a href="notes/Escritos/Canciones-poemas-escritos/" role="button" class="secondary">Ver índice completo</a>
+    </div>
+  </section>
+
+  <section class="poem-index" aria-labelledby="poem-index-heading">
+    <h2 id="poem-index-heading">Poemas publicados</h2>
+    <p id="status-root" role="status">Cargando poemas…</p>
+    <ul id="poem-list-root"></ul>
+    <p class="muted" id="hint-root" hidden>
+      Algunos enlaces aparecen sin archivo porque falta el <code>.md</code> correspondiente.
+      Guárdalo dentro de <code>notes/Escritos/Canciones-poemas-escritos/</code> y vuelve a publicar.
+    </p>
+    <p class="muted">¿Buscas un título en particular? Abre el índice completo para verlo todo.</p>
+  </section>
+
+  <footer>
+    <p>Actualizado automáticamente a partir de los archivos Markdown del repositorio.</p>
+  </footer>
+</main>
+<noscript>
+  <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
+</noscript>
+<script type="module">
+  import initPoemIndex from "./assets/poem-index.js";
+
+  initPoemIndex({
+    listSelector: '#poem-list-root',
+    statusSelector: '#status-root',
+    hintSelector: '#hint-root',
+    indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
+    viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
+    fileBase: 'notes/Escritos/Canciones-poemas-escritos',
+    limit: 24,
+  });
+</script>
