@@ -1,3 +1,10 @@
+---
+Fecha de creación:
+Idioma: Spanish
+Número:
+dg-publish: true
+---
+
 Me pica, me pica tanto que casi escuece.
 Escuece, y empieza a doler.
 
@@ -19,3 +26,4 @@ Pica, pero no hay zumbido.
 Pica, y empieza a doler.
 Pica, ¿el mosquito estará escondido?
 Pica, estira, arde, da calor.
+

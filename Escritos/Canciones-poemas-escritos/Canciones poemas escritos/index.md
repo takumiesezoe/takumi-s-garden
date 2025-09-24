@@ -3,7 +3,8 @@ title: Canciones, poemas y escritos
 dg-publish: true
 dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
 ---
-
+[[I want it to hurt]]
+[[Me pica]]
 [[Amigos|Amigos]]  
 [[A nadie, nunca|A nadie, nunca]]  
 [[Miradas|Miradas]]  
