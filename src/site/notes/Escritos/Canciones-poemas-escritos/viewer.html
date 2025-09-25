@@ -3,15 +3,74 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Visor | Canciones, poemas y escritos</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg-color: #05010a;
+    --panel-color: #12061d;
+    --panel-border: rgba(255, 95, 162, 0.3);
+    --text-color: #fce6f6;
+    --muted-color: #d6a9c5;
+    --accent-color: #ff5fa2;
+    --accent-strong: #ff82c0;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
+    color: var(--text-color);
+  }
+
+  a {
+    color: var(--accent-strong);
+  }
+
+  main.container {
+    padding: 3rem 1.5rem 4rem;
+    max-width: 60rem;
+  }
+
+  h1 {
+    color: var(--accent-color);
+    letter-spacing: 0.04em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  article#content {
+    background: var(--panel-color);
+    border-radius: 1.5rem;
+    border: 1px solid var(--panel-border);
+    padding: 2rem 2.5rem;
+    box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
+    line-height: 1.7;
+  }
+
+  article#content p {
+    color: var(--text-color);
+  }
+
+  article#content em,
+  article#content strong {
+    color: var(--accent-strong);
+  }
+
+  .back-links {
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--muted-color);
+  }
+</style>
 <main class="container">
   <h1 id="title">Cargando…</h1>
   <article id="content">Cargando contenido…</article>
-  <p><a href="./">← Volver al índice</a></p>
+  <p class="back-links"><a href="./">← Volver al índice</a> · <a href="../../../../index.html">Volver a Takumi’s Garden</a></p>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
   const params = new URLSearchParams(location.search);
-  const raw = params.get('file');               // p.ej. "A nadie, nunca.md"
+  const raw = params.get('file');
   const titleEl = document.getElementById('title');
   const contentEl = document.getElementById('content');
 
@@ -19,20 +78,33 @@
     titleEl.textContent = 'Sin archivo';
     contentEl.textContent = 'Falta el parámetro ?file=...';
   } else {
-    const path = raw.endsWith('.md') ? raw : raw + '.md';
-    titleEl.textContent = path.replace(/\.md$/i,'');
-    // ⚠️ encodeURIComponent para codificar espacios, ¿, tildes y COMAS
-    const url = encodeURIComponent(path);
-    fetch(url)
-      .then(r => {
-        if (!r.ok) throw new Error('No se pudo cargar el archivo (' + r.status + ')');
-        return r.text();
-      })
-      .then(md => {
-        contentEl.innerHTML = marked.parse(md);
-      })
-      .catch(err => {
-        contentEl.innerHTML = '<p style="color:#c00">Error: ' + err.message + '</p><p>Intenté cargar: <code>' + url + '</code></p>';
-      });
+    const path = raw.endsWith('.md') ? raw : `${raw}.md`;
+    titleEl.textContent = path.replace(/\.md$/i, '');
+    try {
+      const url = new URL(path, location.href);
+      fetch(url.href)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`No se pudo cargar el archivo (HTTP ${response.status})`);
+          }
+          return response.text();
+        })
+        .then((markdown) => {
+          contentEl.innerHTML = marked.parse(markdown);
+        })
+        .catch((error) => {
+          const message = [
+            '<p style="color:#ff8cc5"><strong>Error:</strong> ' + error.message + '</p>',
+            '<p>Intenté cargar: <code>' + url.href + '</code></p>',
+          ];
+          if (location.protocol === 'file:') {
+            message.push('<p>Si abriste este visor directamente como archivo, prueba usar "Abrir con Live Server" o subirlo a tu hosting para evitar las restricciones del navegador.</p>');
+          }
+          contentEl.innerHTML = message.join('');
+        });
+    } catch (error) {
+      titleEl.textContent = 'Ruta no válida';
+      contentEl.innerHTML = '<p style="color:#ff8cc5">No pude preparar la ruta del archivo: ' + error.message + '</p>';
+    }
   }
 </script>

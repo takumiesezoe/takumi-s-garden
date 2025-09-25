@@ -5,7 +5,14 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 <style>
   :root {
-    color-scheme: light dark;
+    color-scheme: dark;
+    --bg-color: #05010a;
+    --panel-color: #12061d;
+    --panel-border: rgba(255, 95, 162, 0.3);
+    --text-color: #fce6f6;
+    --muted-color: #d6a9c5;
+    --accent-color: #ff5fa2;
+    --accent-strong: #ff82c0;
   }
 
   body {
@@ -13,10 +20,16 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
+    background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
+    color: var(--text-color);
+  }
+
+  a {
+    color: var(--accent-strong);
   }
 
   main.container {
-    padding-block: 3.5rem 4.5rem;
+    padding: 3.5rem 1.75rem 4.5rem;
     max-width: 62rem;
   }
 
@@ -25,10 +38,17 @@
     margin-bottom: 3.5rem;
   }
 
+  .hero h1 {
+    color: var(--accent-color);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
   .hero p {
     font-size: 1.1rem;
     margin-inline: auto;
     max-width: 42rem;
+    color: var(--muted-color);
   }
 
   .hero .actions {
@@ -41,6 +61,27 @@
 
   .hero .actions a[role="button"] {
     min-width: 13rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hero .actions a[role="button"].contrast {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
+    color: var(--bg-color);
+    box-shadow: 0 10px 25px rgba(255, 95, 162, 0.25);
+  }
+
+  .hero .actions a[role="button"].secondary {
+    background: transparent;
+    border-color: rgba(255, 95, 162, 0.45);
+    color: var(--accent-color);
+  }
+
+  .hero .actions a[role="button"]:hover,
+  .hero .actions a[role="button"]:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 35px rgba(255, 95, 162, 0.3);
   }
 
   section.poem-index {
@@ -48,19 +89,24 @@
   }
 
   section.poem-index h2 {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--accent-color);
   }
 
   #status-root {
-    color: var(--muted-color, #666);
+    color: var(--muted-color);
   }
 
   ul#poem-list-root {
     list-style: none;
-    padding: 0;
+    padding: 1.75rem;
     margin: 2rem 0;
     columns: 1;
     column-gap: 2.5rem;
+    background: var(--panel-color);
+    border-radius: 1.5rem;
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
   }
 
   @media (min-width: 56rem) {
@@ -71,19 +117,35 @@
 
   ul#poem-list-root li {
     break-inside: avoid;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.45rem;
   }
 
   ul#poem-list-root li a {
     text-decoration: none;
+    color: var(--text-color);
+    position: relative;
   }
 
-  ul#poem-list-root li a:hover {
-    text-decoration: underline;
+  ul#poem-list-root li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.1rem;
+    width: 100%;
+    height: 0.1rem;
+    background: linear-gradient(90deg, transparent, var(--accent-strong), transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+  }
+
+  ul#poem-list-root li a:hover::after,
+  ul#poem-list-root li a:focus-visible::after {
+    transform: scaleX(1);
   }
 
   ul#poem-list-root li.missing {
-    color: var(--del-color, #c02c2c);
+    color: rgba(255, 152, 188, 0.8);
   }
 
   ul#poem-list-root li.missing span {
@@ -93,21 +155,22 @@
   }
 
   ul#poem-list-root li.more-items {
-    margin-top: 0.75rem;
+    margin-top: 0.9rem;
+    color: var(--muted-color);
   }
 
   footer {
     margin-top: 4rem;
     text-align: center;
-    color: var(--muted-color, #666);
+    color: var(--muted-color);
   }
 </style>
 <main class="container">
   <section class="hero">
     <h1>Takumi’s Garden</h1>
     <p>
-      Canciones, poemas y escritos seleccionados. Explora el índice completo con el visor de
-      Pico CSS para leer cada pieza en modo claro u oscuro según tu dispositivo.
+      Canciones, poemas y escritos seleccionados. Disfruta el nuevo tema negro con acentos rosa y abre el visor
+      para leer cada pieza sin salir de la atmósfera nocturna de Takumi.
     </p>
     <div class="actions">
       <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html" role="button" class="contrast">Abrir el visor</a>
@@ -133,8 +196,97 @@
 <noscript>
   <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
 </noscript>
+<script id="poem-index-markdown" type="application/json">
+---
+title: Canciones, poemas y escritos
+dg-publish: true
+dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
+---
+[[I want it to hurt|I want it to hurt]]
+[[Me pica|Me pica]]
+[[Amigos|Amigos]]
+[[A nadie, nunca|A nadie, nunca]]
+[[Miradas|Miradas]]
+[[Listas|Listas]]
+[[Siempre|Siempre]]
+[[Notificaciones|Notificaciones]]
+[[Inconsciente|Inconsciente]]
+[[Escribo|Escribo]]
+[[Falta|Falta]]
+[[Hospital|Hospital]]
+[[Why is it like this|Why is it like this]]
+[[Creencias|Creencias]]
+[[Sound|Sound]]
+[[Kintsugi|Kintsugi]]
+[[Ganas|Ganas]]
+[[Este chico|Este chico]]
+[[Magnifico|Magnifico]]
+[[No estoy a la altura|No estoy a la altura]]
+[[Scars|Scars]]
+[[Body|Body]]
+[[My big dream|My big dream]]
+[[Delirios en la ducha|Delirios en la ducha]]
+[[Pastis|Pastis]]
+[[Basura|Basura]]
+[[Escenarios|Escenarios]]
+[[Eli x2|Eli x2]]
+[[Delgado|Delgado]]
+[[Porro|Porro]]
+[[Me ha dado miedo|Me ha dado miedo]]
+[[Repito|Repito]]
+[[No es justo|No es justo]]
+[[In the neck|In the neck]]
+[[Indicaciones|Indicaciones]]
+[[Alcohol|Alcohol]]
+[[Sombras|Sombras]]
+[[Aphantasia|Aphantasia]]
+[[¿Para que|¿Para que]]
+[[Duele|Duele]]
+[[Envejecer|Envejecer]]
+[[Same thing|Same thing]]
+[[Abuelo|Abuelo]]
+[[No entiendo|No entiendo]]
+[[Terapeuta virtual|Terapeuta virtual]]
+[[Perdido|Perdido]]
+[[Alone|Alone]]
+[[El lastimado|El lastimado]]
+[[Mi cerebro|Mi cerebro]]
+[[Afilado|Afilado]]
+[[Me volvieron a dejar|Me volvieron a dejar]]
+[[Random vent|Random vent]]
+[[Llanto|Llanto]]
+[[Vacio|Vacio]]
+[[SHP.com|SHP.com]]
+[[Casi lo hago|Casi lo hago]]
+[[Cronico|Cronico]]
+[[En que piensas|En que piensas]]
+[[Todo|Todo]]
+[[Disposable|Disposable]]
+[[Calladito|Calladito]]
+[[Todo mal|Todo mal]]
+[[Borroso|Borroso]]
+[[Waking up or falling down|Waking up or falling down]]
+[[Escapulas|Escapulas]]
+[[En la sien|En la sien]]
+[[3 en ralla|3 en ralla]]
+[[Tik tok curse|Tik tok curse]]
+[[Creo que tengo tlp|Creo que tengo tlp]]
+[[Mala hija|Mala hija]]
+[[Padres|Padres]]
+[[Las veces que he despertado|Las veces que he despertado]]
+[[Slit|Slit]]
+[[Irrealidad|Irrealidad]]
+[[Redentor en ruinas|Redentor en ruinas]]
+[[Mi deseo|Mi deseo]]
+[[TEA|TEA]]
+[[Seen|Seen]]
+[[Sex|Sex]]
+</script>
 <script type="module">
   import initPoemIndex from "./assets/poem-index.js";
+
+  const fallbackSource = document.getElementById('poem-index-markdown');
+  const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
 
   initPoemIndex({
     listSelector: '#poem-list-root',
@@ -144,5 +296,6 @@
     viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
     fileBase: 'notes/Escritos/Canciones-poemas-escritos',
     limit: 24,
+    fallbackMarkdown,
   });
 </script>
