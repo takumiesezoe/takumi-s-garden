@@ -7,6 +7,7 @@
       return items;
     }
 
+    LINK_RE.lastIndex = 0;
     var match;
     while ((match = LINK_RE.exec(markdown)) !== null) {
       var rawTarget = (match[1] || '').trim();
