@@ -122,7 +122,7 @@
   <p class="muted" id="hint" hidden>
     Algunos enlaces aparecen sin archivo porque todavía no existe el <code>.md</code> correspondiente. Asegúrate de guardarlo dentro de esta carpeta y volver a publicar.
   </p>
-  <p class="back-link"><a href="./viewer.html">Ir directo al visor</a> · <a href="../../../../index.html">Volver al inicio</a></p>
+  <p class="back-link"><a href="./viewer.html">Ir directo al visor</a> · <a href="../../../index.html">Volver al inicio</a></p>
 </main>
 <noscript>
   <p role="alert" class="container">Activa JavaScript para ver la lista completa de poemas.</p>
@@ -213,19 +213,27 @@ dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
 [[Seen|Seen]]
 [[Sex|Sex]]
 </script>
-<script type="module">
-  import initPoemIndex from "../../assets/poem-index.js";
+<script src="../../../assets/poem-index.js"></script>
+<script>
+  (function () {
+    if (typeof initPoemIndex !== 'function') {
+      return;
+    }
 
-  const fallbackSource = document.getElementById('poem-index-markdown');
-  const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
+    var fallbackSource = document.getElementById('poem-index-markdown');
+    var fallbackMarkdown = null;
+    if (fallbackSource && typeof fallbackSource.textContent === 'string') {
+      fallbackMarkdown = fallbackSource.textContent.trim();
+    }
 
-  initPoemIndex({
-    listSelector: '#poem-list',
-    statusSelector: '#status',
-    hintSelector: '#hint',
-    indexPath: 'index.md',
-    viewerBase: 'viewer.html',
-    fileBase: '',
-    fallbackMarkdown,
-  });
+    initPoemIndex({
+      listSelector: '#poem-list',
+      statusSelector: '#status',
+      hintSelector: '#hint',
+      indexPath: 'index.md',
+      viewerBase: 'viewer.html',
+      fileBase: '',
+      fallbackMarkdown: fallbackMarkdown,
+    });
+  })();
 </script>

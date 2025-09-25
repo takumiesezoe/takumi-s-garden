@@ -282,20 +282,28 @@ dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
 [[Seen|Seen]]
 [[Sex|Sex]]
 </script>
-<script type="module">
-  import initPoemIndex from "./assets/poem-index.js";
+<script src="./assets/poem-index.js"></script>
+<script>
+  (function () {
+    if (typeof initPoemIndex !== 'function') {
+      return;
+    }
 
-  const fallbackSource = document.getElementById('poem-index-markdown');
-  const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
+    var fallbackSource = document.getElementById('poem-index-markdown');
+    var fallbackMarkdown = null;
+    if (fallbackSource && typeof fallbackSource.textContent === 'string') {
+      fallbackMarkdown = fallbackSource.textContent.trim();
+    }
 
-  initPoemIndex({
-    listSelector: '#poem-list-root',
-    statusSelector: '#status-root',
-    hintSelector: '#hint-root',
-    indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
-    viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
-    fileBase: 'notes/Escritos/Canciones-poemas-escritos',
-    limit: 24,
-    fallbackMarkdown,
-  });
+    initPoemIndex({
+      listSelector: '#poem-list-root',
+      statusSelector: '#status-root',
+      hintSelector: '#hint-root',
+      indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
+      viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
+      fileBase: 'notes/Escritos/Canciones-poemas-escritos',
+      limit: 24,
+      fallbackMarkdown: fallbackMarkdown,
+    });
+  })();
 </script>
