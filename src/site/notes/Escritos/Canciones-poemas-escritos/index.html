@@ -4,59 +4,220 @@
 <title>Canciones, poemas y escritos</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
 <style>
-  body { margin: 0; }
+  :root {
+    color-scheme: dark;
+    --bg-color: #05010a;
+    --panel-color: #12061d;
+    --panel-border: rgba(255, 95, 162, 0.3);
+    --text-color: #fce6f6;
+    --muted-color: #d6a9c5;
+    --accent-color: #ff5fa2;
+    --accent-strong: #ff82c0;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
+    color: var(--text-color);
+  }
+
+  a {
+    color: var(--accent-strong);
+  }
+
   main.container {
-    padding-block: 3rem;
+    padding: 3rem 1.5rem 4rem;
     max-width: 60rem;
   }
-  #status {
-    color: var(--muted-color, #666);
+
+  h1 {
+    color: var(--accent-color);
+    text-align: center;
+    letter-spacing: 0.04em;
   }
+
+  p.lead {
+    margin-inline: auto;
+    max-width: 40rem;
+    text-align: center;
+    color: var(--muted-color);
+  }
+
+  #status {
+    color: var(--muted-color);
+  }
+
   ul#poem-list {
     list-style: none;
-    padding: 0;
-    margin: 2rem 0;
+    padding: 1.75rem;
+    margin: 2.5rem 0;
     columns: 1;
     column-gap: 2.5rem;
+    background: var(--panel-color);
+    border-radius: 1.5rem;
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
   }
+
   @media (min-width: 56rem) {
     ul#poem-list {
       columns: 2;
     }
   }
+
   ul#poem-list li {
     break-inside: avoid;
-    margin-bottom: .35rem;
+    margin-bottom: 0.45rem;
   }
+
   ul#poem-list li a {
     text-decoration: none;
+    color: var(--text-color);
+    position: relative;
   }
-  ul#poem-list li a:hover {
-    text-decoration: underline;
+
+  ul#poem-list li a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -0.1rem;
+    width: 100%;
+    height: 0.1rem;
+    background: linear-gradient(90deg, transparent, var(--accent-strong), transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.2s ease;
   }
+
+  ul#poem-list li a:hover::after,
+  ul#poem-list li a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
   ul#poem-list li.missing {
-    color: var(--del-color, #c02c2c);
+    color: rgba(255, 152, 188, 0.8);
   }
+
   ul#poem-list li.missing span {
-    font-size: .9em;
-    margin-left: .35rem;
+    font-size: 0.9em;
+    margin-left: 0.35rem;
     color: inherit;
+  }
+
+  #hint {
+    color: var(--muted-color);
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 2rem;
   }
 </style>
 <main class="container">
   <h1>Canciones, poemas y escritos</h1>
-  <p>Selecciona un poema para abrirlo en el visor con el nuevo tema claro/oscuro.</p>
+  <p class="lead">Selecciona cualquier título para abrirlo en el visor rosa &amp; negro. El listado se genera aunque abras el archivo sin servidor.</p>
   <p id="status" role="status">Cargando poemas…</p>
   <ul id="poem-list"></ul>
   <p class="muted" id="hint" hidden>
     Algunos enlaces aparecen sin archivo porque todavía no existe el <code>.md</code> correspondiente. Asegúrate de guardarlo dentro de esta carpeta y volver a publicar.
   </p>
+  <p class="back-link"><a href="./viewer.html">Ir directo al visor</a> · <a href="../../../../index.html">Volver al inicio</a></p>
 </main>
 <noscript>
   <p role="alert" class="container">Activa JavaScript para ver la lista completa de poemas.</p>
 </noscript>
+<script id="poem-index-markdown" type="application/json">
+---
+title: Canciones, poemas y escritos
+dg-publish: true
+dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
+---
+[[I want it to hurt|I want it to hurt]]
+[[Me pica|Me pica]]
+[[Amigos|Amigos]]
+[[A nadie, nunca|A nadie, nunca]]
+[[Miradas|Miradas]]
+[[Listas|Listas]]
+[[Siempre|Siempre]]
+[[Notificaciones|Notificaciones]]
+[[Inconsciente|Inconsciente]]
+[[Escribo|Escribo]]
+[[Falta|Falta]]
+[[Hospital|Hospital]]
+[[Why is it like this|Why is it like this]]
+[[Creencias|Creencias]]
+[[Sound|Sound]]
+[[Kintsugi|Kintsugi]]
+[[Ganas|Ganas]]
+[[Este chico|Este chico]]
+[[Magnifico|Magnifico]]
+[[No estoy a la altura|No estoy a la altura]]
+[[Scars|Scars]]
+[[Body|Body]]
+[[My big dream|My big dream]]
+[[Delirios en la ducha|Delirios en la ducha]]
+[[Pastis|Pastis]]
+[[Basura|Basura]]
+[[Escenarios|Escenarios]]
+[[Eli x2|Eli x2]]
+[[Delgado|Delgado]]
+[[Porro|Porro]]
+[[Me ha dado miedo|Me ha dado miedo]]
+[[Repito|Repito]]
+[[No es justo|No es justo]]
+[[In the neck|In the neck]]
+[[Indicaciones|Indicaciones]]
+[[Alcohol|Alcohol]]
+[[Sombras|Sombras]]
+[[Aphantasia|Aphantasia]]
+[[¿Para que|¿Para que]]
+[[Duele|Duele]]
+[[Envejecer|Envejecer]]
+[[Same thing|Same thing]]
+[[Abuelo|Abuelo]]
+[[No entiendo|No entiendo]]
+[[Terapeuta virtual|Terapeuta virtual]]
+[[Perdido|Perdido]]
+[[Alone|Alone]]
+[[El lastimado|El lastimado]]
+[[Mi cerebro|Mi cerebro]]
+[[Afilado|Afilado]]
+[[Me volvieron a dejar|Me volvieron a dejar]]
+[[Random vent|Random vent]]
+[[Llanto|Llanto]]
+[[Vacio|Vacio]]
+[[SHP.com|SHP.com]]
+[[Casi lo hago|Casi lo hago]]
+[[Cronico|Cronico]]
+[[En que piensas|En que piensas]]
+[[Todo|Todo]]
+[[Disposable|Disposable]]
+[[Calladito|Calladito]]
+[[Todo mal|Todo mal]]
+[[Borroso|Borroso]]
+[[Waking up or falling down|Waking up or falling down]]
+[[Escapulas|Escapulas]]
+[[En la sien|En la sien]]
+[[3 en ralla|3 en ralla]]
+[[Tik tok curse|Tik tok curse]]
+[[Creo que tengo tlp|Creo que tengo tlp]]
+[[Mala hija|Mala hija]]
+[[Padres|Padres]]
+[[Las veces que he despertado|Las veces que he despertado]]
+[[Slit|Slit]]
+[[Irrealidad|Irrealidad]]
+[[Redentor en ruinas|Redentor en ruinas]]
+[[Mi deseo|Mi deseo]]
+[[TEA|TEA]]
+[[Seen|Seen]]
+[[Sex|Sex]]
+</script>
 <script type="module">
   import initPoemIndex from "../../assets/poem-index.js";
+
+  const fallbackSource = document.getElementById('poem-index-markdown');
+  const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
 
   initPoemIndex({
     listSelector: '#poem-list',
@@ -65,5 +226,6 @@
     indexPath: 'index.md',
     viewerBase: 'viewer.html',
     fileBase: '',
+    fallbackMarkdown,
   });
 </script>

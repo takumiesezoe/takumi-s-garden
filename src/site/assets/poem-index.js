@@ -64,6 +64,7 @@ export function initPoemIndex(options = {}) {
 
   const fileBasePath = normalizeBase(fileBase);
   const limited = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : null;
+  const isFileProtocol = typeof window !== 'undefined' && window.location?.protocol === 'file:';
 
   const renderItems = (items) => {
     clearList(listEl);
@@ -86,21 +87,23 @@ export function initPoemIndex(options = {}) {
       li.appendChild(link);
       listEl.appendChild(li);
 
-      fetch(`${fileBasePath}${encoded}`, { method: 'HEAD' })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('missing');
-          }
-        })
-        .catch(() => {
-          li.classList.add('missing');
-          link.removeAttribute('href');
-          const warning = document.createElement('span');
-          warning.textContent = '(archivo faltante)';
-          li.appendChild(warning);
-          setHintVisible(true);
-          setStatus('Hay poemas pendientes por subir.');
-        });
+      if (!isFileProtocol) {
+        fetch(`${fileBasePath}${encoded}`, { method: 'HEAD' })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('missing');
+            }
+          })
+          .catch(() => {
+            li.classList.add('missing');
+            link.removeAttribute('href');
+            const warning = document.createElement('span');
+            warning.textContent = '(archivo faltante)';
+            li.appendChild(warning);
+            setHintVisible(true);
+            setStatus('Hay poemas pendientes por subir.');
+          });
+      }
     });
 
     if (limited && items.length > visibleItems.length) {
