@@ -64,7 +64,10 @@ export function initPoemIndex(options = {}) {
 
   const fileBasePath = normalizeBase(fileBase);
   const limited = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : null;
-  const isFileProtocol = typeof window !== 'undefined' && window.location?.protocol === 'file:';
+  const isFileProtocol =
+    typeof window !== 'undefined' &&
+    window.location &&
+    window.location.protocol === 'file:';
 
   const renderItems = (items) => {
     clearList(listEl);
