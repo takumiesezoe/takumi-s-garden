@@ -112,11 +112,17 @@
               }
             })
             .catch(function () {
-              li.classList.add('missing');
-              link.removeAttribute('href');
-              var warning = document.createElement('span');
-              warning.textContent = '(archivo faltante)';
-              li.appendChild(warning);
+              if (!li.classList.contains('missing')) {
+                li.classList.add('missing');
+              }
+              if (!li.querySelector('.missing-warning')) {
+                var spacer = document.createTextNode(' ');
+                li.appendChild(spacer);
+                var warning = document.createElement('span');
+                warning.className = 'missing-warning';
+                warning.textContent = '(archivo faltante)';
+                li.appendChild(warning);
+              }
               setHintVisible(true);
               setStatus('Hay poemas pendientes por subir.');
             });
