@@ -1,202 +1,312 @@
 <!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Takumi’s Garden</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-<style>
-  :root {
-    color-scheme: dark;
-    --bg-color: #05010a;
-    --panel-color: #12061d;
-    --panel-border: rgba(255, 95, 162, 0.3);
-    --text-color: #fce6f6;
-    --muted-color: #d6a9c5;
-    --accent-color: #ff5fa2;
-    --accent-strong: #ff82c0;
-  }
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Takumi’s Garden</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg-color: #05010a;
+        --panel-color: #12061d;
+        --panel-border: rgba(255, 95, 162, 0.3);
+        --text-color: #fce6f6;
+        --muted-color: #d6a9c5;
+        --accent-color: #ff5fa2;
+        --accent-strong: #ff82c0;
+      }
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
-    color: var(--text-color);
-  }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
+        color: var(--text-color);
+      }
 
-  a {
-    color: var(--accent-strong);
-  }
+      header.site-header {
+        padding: 1.5rem 0;
+      }
 
-  main.container {
-    padding: 3.5rem 1.75rem 4.5rem;
-    max-width: 62rem;
-  }
+      header .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
 
-  .hero {
-    text-align: center;
-    margin-bottom: 3.5rem;
-  }
+      header .title h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 5vw, 2.4rem);
+        color: var(--accent-strong);
+      }
 
-  .hero h1 {
-    color: var(--accent-color);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
+      header .title nav {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
 
-  .hero p {
-    font-size: 1.1rem;
-    margin-inline: auto;
-    max-width: 42rem;
-    color: var(--muted-color);
-  }
+      header .title nav a {
+        text-decoration: none;
+        font-weight: 600;
+        color: var(--muted-color);
+      }
 
-  .hero .actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-  }
+      header .title nav a:hover,
+      header .title nav a:focus-visible {
+        color: var(--accent-strong);
+      }
 
-  .hero .actions a[role="button"] {
-    min-width: 13rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
+      main {
+        flex: 1;
+      }
 
-  .hero .actions a[role="button"].contrast {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
-    color: var(--bg-color);
-    box-shadow: 0 10px 25px rgba(255, 95, 162, 0.25);
-  }
+      main .container {
+        padding-bottom: 4.5rem;
+      }
 
-  .hero .actions a[role="button"].secondary {
-    background: transparent;
-    border-color: rgba(255, 95, 162, 0.45);
-    color: var(--accent-color);
-  }
+      section.hero {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
 
-  .hero .actions a[role="button"]:hover,
-  .hero .actions a[role="button"]:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 35px rgba(255, 95, 162, 0.3);
-  }
+      section.hero h2 {
+        margin-bottom: 1rem;
+        font-size: clamp(1.6rem, 4vw, 2rem);
+        color: var(--accent-color);
+      }
 
-  section.poem-index {
-    margin-top: 1rem;
-  }
+      section.hero p {
+        margin: 0 auto;
+        max-width: 48rem;
+        color: var(--muted-color);
+      }
 
-  section.poem-index h2 {
-    margin-bottom: 0.75rem;
-    color: var(--accent-color);
-  }
+      section.hero .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
 
-  #status-root {
-    color: var(--muted-color);
-  }
+      section.hero .actions a[role="button"] {
+        min-width: 13rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
 
-  ul#poem-list-root {
-    list-style: none;
-    padding: 1.75rem;
-    margin: 2rem 0;
-    columns: 1;
-    column-gap: 2.5rem;
-    background: var(--panel-color);
-    border-radius: 1.5rem;
-    border: 1px solid var(--panel-border);
-    box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
-  }
+      section.hero .actions a[role="button"].contrast {
+        background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
+        color: var(--bg-color);
+        box-shadow: 0 10px 25px rgba(255, 95, 162, 0.25);
+      }
 
-  @media (min-width: 56rem) {
-    ul#poem-list-root {
-      columns: 2;
-    }
-  }
+      section.hero .actions a[role="button"].secondary {
+        background: transparent;
+        border-color: rgba(255, 95, 162, 0.45);
+        color: var(--accent-color);
+      }
 
-  ul#poem-list-root li {
-    break-inside: avoid;
-    margin-bottom: 0.45rem;
-  }
+      section.hero .actions a[role="button"]:hover,
+      section.hero .actions a[role="button"]:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 35px rgba(255, 95, 162, 0.3);
+      }
 
-  ul#poem-list-root li a {
-    text-decoration: none;
-    color: var(--text-color);
-    position: relative;
-  }
+      section.feature-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 3.5rem;
+      }
 
-  ul#poem-list-root li a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -0.1rem;
-    width: 100%;
-    height: 0.1rem;
-    background: linear-gradient(90deg, transparent, var(--accent-strong), transparent);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.2s ease;
-  }
+      section.feature-grid article {
+        background: var(--panel-color);
+        border: 1px solid var(--panel-border);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        box-shadow: 0 18px 40px rgba(10, 2, 20, 0.45);
+      }
 
-  ul#poem-list-root li a:hover::after,
-  ul#poem-list-root li a:focus-visible::after {
-    transform: scaleX(1);
-  }
+      section.feature-grid h3 {
+        margin-top: 0;
+        color: var(--accent-color);
+      }
 
-  ul#poem-list-root li.missing {
-    color: rgba(255, 152, 188, 0.8);
-  }
+      section.feature-grid p {
+        color: var(--muted-color);
+      }
 
-  ul#poem-list-root li.missing span {
-    font-size: 0.9em;
-    margin-left: 0.35rem;
-    color: inherit;
-  }
+      section.feature-grid a.more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        font-weight: 600;
+      }
 
-  ul#poem-list-root li.more-items {
-    margin-top: 0.9rem;
-    color: var(--muted-color);
-  }
+      section.poem-index h2 {
+        margin-bottom: 0.75rem;
+        color: var(--accent-color);
+      }
 
-  footer {
-    margin-top: 4rem;
-    text-align: center;
-    color: var(--muted-color);
-  }
-</style>
-<main class="container">
-  <section class="hero">
-    <h1>Takumi’s Garden</h1>
-    <p>
-      Canciones, poemas y escritos seleccionados. Disfruta el nuevo tema negro con acentos rosa y abre el visor
-      para leer cada pieza sin salir de la atmósfera nocturna de Takumi.
-    </p>
-    <div class="actions">
-      <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html" role="button" class="contrast">Abrir el visor</a>
-      <a href="notes/Escritos/Canciones-poemas-escritos/" role="button" class="secondary">Ver índice completo</a>
-    </div>
-  </section>
+      #status-root {
+        color: var(--muted-color);
+      }
 
-  <section class="poem-index" aria-labelledby="poem-index-heading">
-    <h2 id="poem-index-heading">Poemas publicados</h2>
-    <p id="status-root" role="status">Cargando poemas…</p>
-    <ul id="poem-list-root"></ul>
-    <p class="muted" id="hint-root" hidden>
-      Algunos enlaces aparecen sin archivo porque falta el <code>.md</code> correspondiente.
-      Guárdalo dentro de <code>notes/Escritos/Canciones-poemas-escritos/</code> y vuelve a publicar.
-    </p>
-    <p class="muted">¿Buscas un título en particular? Abre el índice completo para verlo todo.</p>
-  </section>
+      ul#poem-list-root {
+        list-style: none;
+        padding: 1.75rem;
+        margin: 2rem 0;
+        columns: 1;
+        column-gap: 2.5rem;
+        background: var(--panel-color);
+        border-radius: 1.5rem;
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
+      }
 
-  <footer>
-    <p>Actualizado automáticamente a partir de los archivos Markdown del repositorio.</p>
-  </footer>
-</main>
-<noscript>
-  <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
-</noscript>
-<script id="poem-index-markdown" type="application/json">
+      @media (min-width: 56rem) {
+        section.feature-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        ul#poem-list-root {
+          columns: 2;
+        }
+      }
+
+      ul#poem-list-root li {
+        break-inside: avoid;
+        margin-bottom: 0.45rem;
+      }
+
+      ul#poem-list-root li a {
+        text-decoration: none;
+        color: var(--text-color);
+        position: relative;
+      }
+
+      ul#poem-list-root li a::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -0.1rem;
+        width: 100%;
+        height: 0.1rem;
+        background: linear-gradient(90deg, transparent, var(--accent-strong), transparent);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform 0.2s ease;
+      }
+
+      ul#poem-list-root li a:hover::after,
+      ul#poem-list-root li a:focus-visible::after {
+        transform: scaleX(1);
+      }
+
+      ul#poem-list-root li.missing {
+        color: rgba(255, 152, 188, 0.8);
+      }
+
+      ul#poem-list-root li.missing span {
+        font-size: 0.9em;
+        margin-left: 0.35rem;
+        color: inherit;
+      }
+
+      ul#poem-list-root li.more-items {
+        margin-top: 0.9rem;
+        color: var(--muted-color);
+      }
+
+      footer {
+        margin-top: 4rem;
+        padding: 2rem 0 3rem;
+        text-align: center;
+        color: var(--muted-color);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <div class="title">
+          <h1>Takumi’s Garden</h1>
+          <nav aria-label="Navegación principal">
+            <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html">Visor</a>
+            <a href="notes/Escritos/Canciones-poemas-escritos/">Índice completo</a>
+            <a href="notes/">Notas</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <section class="hero">
+          <h2>Poemas, canciones y fragmentos en un solo jardín nocturno.</h2>
+          <p>
+            Explora los escritos de Takumi con el nuevo portal que enlaza a cada poema publicado y al visor inmersivo.
+            Todo el contenido se genera a partir de los archivos Markdown del repositorio.
+          </p>
+          <div class="actions">
+            <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html" role="button" class="contrast">Abrir el visor</a>
+            <a href="notes/Escritos/Canciones-poemas-escritos/" role="button" class="secondary">Ver índice completo</a>
+          </div>
+        </section>
+
+        <section class="feature-grid" aria-label="Explorar secciones">
+          <article>
+            <h3>Visor de lectura</h3>
+            <p>
+              Carga los poemas en pantalla completa con tipografía cuidada y controles para navegar el cuaderno como si
+              fuera una publicación impresa.
+            </p>
+            <a class="more" href="notes/Escritos/Canciones-poemas-escritos/viewer.html">Abrir visor</a>
+          </article>
+          <article>
+            <h3>Índice navegable</h3>
+            <p>
+              Accede al listado completo de notas exportadas desde Obsidian. Cada enlace te lleva al documento Markdown
+              original hospedado en GitHub Pages.
+            </p>
+            <a class="more" href="notes/Escritos/Canciones-poemas-escritos/">Ir al índice</a>
+          </article>
+          <article>
+            <h3>Notas del jardín</h3>
+            <p>
+              Además de los poemas, encontrarás textos sueltos y material de referencia en la carpeta general de notas.
+              Es la mejor forma de seguir el proceso creativo.
+            </p>
+            <a class="more" href="notes/">Explorar notas</a>
+          </article>
+        </section>
+
+        <section class="poem-index" aria-labelledby="poem-index-heading">
+          <h2 id="poem-index-heading">Poemas publicados</h2>
+          <p id="status-root" role="status">Cargando poemas…</p>
+          <ul id="poem-list-root"></ul>
+          <p class="muted" id="hint-root" hidden>
+            Algunos enlaces aparecen sin archivo porque falta el <code>.md</code> correspondiente.
+            Guárdalo dentro de <code>notes/Escritos/Canciones-poemas-escritos/</code> y vuelve a publicar.
+          </p>
+          <p class="muted">¿Buscas un título en particular? Abre el índice completo para verlo todo.</p>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <div class="container">
+        <p>Actualizado automáticamente a partir de los archivos Markdown del repositorio.</p>
+      </div>
+    </footer>
+    <noscript>
+      <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
+    </noscript>
+    <script id="poem-index-markdown" type="application/json">
 ---
 title: Canciones, poemas y escritos
 dg-publish: true
@@ -281,21 +391,23 @@ dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
 [[TEA|TEA]]
 [[Seen|Seen]]
 [[Sex|Sex]]
-</script>
-<script type="module">
-  import initPoemIndex from "./assets/poem-index.js";
+    </script>
+    <script type="module">
+      import initPoemIndex from "./assets/poem-index.js";
 
-  const fallbackSource = document.getElementById('poem-index-markdown');
-  const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
+      const fallbackSource = document.getElementById('poem-index-markdown');
+      const fallbackMarkdown = fallbackSource ? fallbackSource.textContent.trim() : null;
 
-  initPoemIndex({
-    listSelector: '#poem-list-root',
-    statusSelector: '#status-root',
-    hintSelector: '#hint-root',
-    indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
-    viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
-    fileBase: 'notes/Escritos/Canciones-poemas-escritos',
-    limit: 24,
-    fallbackMarkdown,
-  });
-</script>
+      initPoemIndex({
+        listSelector: '#poem-list-root',
+        statusSelector: '#status-root',
+        hintSelector: '#hint-root',
+        indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
+        viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
+        fileBase: 'notes/Escritos/Canciones-poemas-escritos',
+        limit: 24,
+        fallbackMarkdown,
+      });
+    </script>
+  </body>
+</html>
