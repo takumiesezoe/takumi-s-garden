@@ -56,11 +56,11 @@ export function initPoemIndex(options = {}) {
     }
   };
 
-  const setHintVisible = (visible) => {
+  function setHintVisible(visible) {
     if (hintEl) {
       hintEl.hidden = !visible;
     }
-  };
+  }
 
   const fileBasePath = normalizeBase(fileBase);
   const limited = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : null;
