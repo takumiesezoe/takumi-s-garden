@@ -23,6 +23,19 @@ python -m http.server --directory src/site 3000
 
 Then visit <http://localhost:3000> in your browser.
 
+### ¿Problemas con `fatal: not a git repository`?
+
+Si ves un error como `fatal: not a git repository (or any of the parent directories): .git` al ejecutar comandos de Git, significa que no estás dentro de un repositorio inicializado. Asegúrate de clonar el proyecto en vez de descargarlo como ZIP y de ejecutar los comandos desde la carpeta raíz de `takumi-s-garden`.
+
+```bash
+git clone git@github.com:TU-USUARIO/takumi-s-garden.git
+cd takumi-s-garden
+# ahora sí, por ejemplo:
+git status
+```
+
+Si ya descargaste los archivos manualmente y perdiste la carpeta `.git`, puedes volver a crearla con `git init` y volver a asociar el remoto (`git remote add origin …`), aunque lo más sencillo suele ser clonar nuevamente el repositorio.
+
 ## Maintaining the poem index
 
 The list of poems shown on the home page is generated from [`notes/Escritos/Canciones-poemas-escritos/index.md`](src/site/notes/Escritos/Canciones-poemas-escritos/index.md). Maintaining the hundreds of wiki-style links by hand can be error-prone. The [`fix_index_links.py`](fix_index_links.py) utility checks the links and suggests corrections that match existing Markdown files.
