@@ -1,228 +1,75 @@
-<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Takumi’s Garden</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-<style>
-  :root {
-    color-scheme: dark;
-    --bg-color: #05010a;
-    --panel-color: #12061d;
-    --panel-border: rgba(255, 95, 162, 0.3);
-    --text-color: #fce6f6;
-    --muted-color: #d6a9c5;
-    --accent-color: #ff5fa2;
-    --accent-strong: #ff82c0;
-  }
+             Carga los poemas en pantalla completa con tipografía cuidada y controles para navegar el cuaderno como si
+              fuera una publicación impresa.
+            </p>
+            <a class="more" href="notes/Escritos/Canciones-poemas-escritos/viewer.html">Abrir visor</a>
+          </article>
+          <article>
+            <h3>Índice navegable</h3>
+            <p>
+              Accede al listado completo de notas exportadas desde Obsidian. Cada enlace te lleva al documento Markdown
+              original hospedado en GitHub Pages.
+            </p>
+            <a class="more" href="notes/Escritos/Canciones-poemas-escritos/">Ir al índice</a>
+          </article>
+          <article>
+            <h3>Notas del jardín</h3>
+            <p>
+              Además de los poemas, encontrarás textos sueltos y material de referencia en la carpeta general de notas.
+              Es la mejor forma de seguir el proceso creativo.
+            </p>
+            <a class="more" href="notes/">Explorar notas</a>
+          </article>
+        </section>
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    background: radial-gradient(circle at top, rgba(255, 95, 162, 0.12), transparent 55%), var(--bg-color);
-    color: var(--text-color);
-  }
-
-  a {
-    color: var(--accent-strong);
-  }
-
-  main.container {
-    padding: 3.5rem 1.75rem 4.5rem;
-    max-width: 62rem;
-  }
-
-  .hero {
-    text-align: center;
-    margin-bottom: 3.5rem;
-  }
-
-  .hero h1 {
-    color: var(--accent-color);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-
-  .hero p {
-    font-size: 1.1rem;
-    margin-inline: auto;
-    max-width: 42rem;
-    color: var(--muted-color);
-  }
-
-  .hero .actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-  }
-
-  .hero .actions a[role="button"] {
-    min-width: 13rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .hero .actions a[role="button"].contrast {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
-    color: var(--bg-color);
-    box-shadow: 0 10px 25px rgba(255, 95, 162, 0.25);
-  }
-
-  .hero .actions a[role="button"].secondary {
-    background: transparent;
-    border-color: rgba(255, 95, 162, 0.45);
-    color: var(--accent-color);
-  }
-
-  .hero .actions a[role="button"]:hover,
-  .hero .actions a[role="button"]:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 35px rgba(255, 95, 162, 0.3);
-  }
-
-  section.poem-index {
-    margin-top: 1rem;
-  }
-
-  section.poem-index h2 {
-    margin-bottom: 0.75rem;
-    color: var(--accent-color);
-  }
-
-  #status-root {
-    color: var(--muted-color);
-  }
-
-  ul#poem-list-root {
-    list-style: none;
-    padding: 1.75rem;
-    margin: 2rem 0;
-    columns: 1;
-    column-gap: 2.5rem;
-    background: var(--panel-color);
-    border-radius: 1.5rem;
-    border: 1px solid var(--panel-border);
-    box-shadow: 0 25px 50px rgba(10, 2, 20, 0.55);
-  }
-
-  @media (min-width: 56rem) {
-    ul#poem-list-root {
-      columns: 2;
-    }
-  }
-
-  ul#poem-list-root li {
-    break-inside: avoid;
-    margin-bottom: 0.45rem;
-  }
-
-  ul#poem-list-root li a {
-    text-decoration: none;
-    color: var(--text-color);
-    position: relative;
-  }
-
-  ul#poem-list-root li a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -0.1rem;
-    width: 100%;
-    height: 0.1rem;
-    background: linear-gradient(90deg, transparent, var(--accent-strong), transparent);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.2s ease;
-  }
-
-  ul#poem-list-root li a:hover::after,
-  ul#poem-list-root li a:focus-visible::after {
-    transform: scaleX(1);
-  }
-
-  ul#poem-list-root li.missing {
-    color: rgba(255, 152, 188, 0.8);
-  }
-
-  ul#poem-list-root li.missing span {
-    font-size: 0.9em;
-    margin-left: 0.35rem;
-    color: inherit;
-  }
-
-  ul#poem-list-root li.more-items {
-    margin-top: 0.9rem;
-    color: var(--muted-color);
-  }
-
-  footer {
-    margin-top: 4rem;
-    text-align: center;
-    color: var(--muted-color);
-  }
-</style>
-<main class="container">
-  <section class="hero">
-    <h1>Takumi’s Garden</h1>
-    <p>
-      Canciones, poemas y escritos seleccionados. Disfruta el nuevo tema negro con acentos rosa y abre el visor
-      para leer cada pieza sin salir de la atmósfera nocturna de Takumi.
-    </p>
-    <div class="actions">
-      <a href="notes/Escritos/Canciones-poemas-escritos/viewer.html" role="button" class="contrast">Abrir el visor</a>
-      <a href="notes/Escritos/Canciones-poemas-escritos/" role="button" class="secondary">Ver índice completo</a>
-    </div>
-  </section>
-
-  <section class="poem-index" aria-labelledby="poem-index-heading">
-    <h2 id="poem-index-heading">Poemas publicados</h2>
-    <p id="status-root" role="status">Lista precargada desde index.md.</p>
-    <ul id="poem-list-root">
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=I%20want%20it%20to%20hurt.md">I want it to hurt</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Me%20pica.md">Me pica</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Amigos.md">Amigos</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=A%20nadie%2C%20nunca.md">A nadie, nunca</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Miradas.md">Miradas</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Listas.md">Listas</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Siempre.md">Siempre</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Notificaciones.md">Notificaciones</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Inconsciente.md">Inconsciente</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Escribo.md">Escribo</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Falta.md">Falta</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Hospital.md">Hospital</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Why%20is%20it%20like%20this.md">Why is it like this</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Creencias.md">Creencias</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Sound.md">Sound</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Kintsugi.md">Kintsugi</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Ganas.md">Ganas</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Este%20chico.md">Este chico</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Magnifico.md">Magnifico</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=No%20estoy%20a%20la%20altura.md">No estoy a la altura</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Scars.md">Scars</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Body.md">Body</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=My%20big%20dream.md">My big dream</a></li>
-      <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Delirios%20en%20la%20ducha.md">Delirios en la ducha</a></li>
-      <li class="more-items muted">… y 55 poemas más en el índice completo.</li>
-    </ul>
-    <p class="muted" id="hint-root" hidden>
-      Algunos enlaces aparecen sin archivo porque falta el <code>.md</code> correspondiente.
-      Guárdalo dentro de <code>notes/Escritos/Canciones-poemas-escritos/</code> y vuelve a publicar.
-    </p>
-    <p class="muted">¿Buscas un título en particular? Abre el índice completo para verlo todo.</p>
-  </section>
-
-  <footer>
-    <p>Actualizado automáticamente a partir de los archivos Markdown del repositorio.</p>
-  </footer>
-</main>
-<noscript>
-  <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
-</noscript>
-<script id="poem-index-markdown" type="application/json">
+        <section class="poem-index" aria-labelledby="poem-index-heading">
+          <h2 id="poem-index-heading">Poemas publicados</h2>
+          <p id="status-root" role="status">Cargando poemas…</p>
+          <ul id="poem-list-root"></ul>
+          <p id="status-root" role="status">Lista precargada desde index.md.</p>
+          <ul id="poem-list-root">
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=I%20want%20it%20to%20hurt.md">I want it to hurt</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Me%20pica.md">Me pica</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Amigos.md">Amigos</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=A%20nadie%2C%20nunca.md">A nadie, nunca</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Miradas.md">Miradas</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Listas.md">Listas</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Siempre.md">Siempre</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Notificaciones.md">Notificaciones</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Inconsciente.md">Inconsciente</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Escribo.md">Escribo</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Falta.md">Falta</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Hospital.md">Hospital</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Why%20is%20it%20like%20this.md">Why is it like this</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Creencias.md">Creencias</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Sound.md">Sound</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Kintsugi.md">Kintsugi</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Ganas.md">Ganas</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Este%20chico.md">Este chico</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Magnifico.md">Magnifico</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=No%20estoy%20a%20la%20altura.md">No estoy a la altura</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Scars.md">Scars</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Body.md">Body</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=My%20big%20dream.md">My big dream</a></li>
+            <li><a href="notes/Escritos/Canciones-poemas-escritos/viewer.html?file=Delirios%20en%20la%20ducha.md">Delirios en la ducha</a></li>
+            <li class="more-items muted">… y 55 poemas más en el índice completo.</li>
+          </ul>
+          <p class="muted" id="hint-root" hidden>
+            Algunos enlaces aparecen sin archivo porque falta el <code>.md</code> correspondiente.
+            Guárdalo dentro de <code>notes/Escritos/Canciones-poemas-escritos/</code> y vuelve a publicar.
+          </p>
+          <p class="muted">¿Buscas un título en particular? Abre el índice completo para verlo todo.</p>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <div class="container">
+        <p>Actualizado automáticamente a partir de los archivos Markdown del repositorio.</p>
+      </div>
+    </footer>
+    <noscript>
+      <p role="alert" class="container">Activa JavaScript para generar la lista de poemas.</p>
+    </noscript>
+    <script id="poem-index-markdown" type="application/json">
 ---
 title: Canciones, poemas y escritos
 dg-publish: true
@@ -231,105 +78,3 @@ dg-permalink: /Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/
 [[I want it to hurt|I want it to hurt]]
 [[Me pica|Me pica]]
 [[Amigos|Amigos]]
-[[A nadie, nunca|A nadie, nunca]]
-[[Miradas|Miradas]]
-[[Listas|Listas]]
-[[Siempre|Siempre]]
-[[Notificaciones|Notificaciones]]
-[[Inconsciente|Inconsciente]]
-[[Escribo|Escribo]]
-[[Falta|Falta]]
-[[Hospital|Hospital]]
-[[Why is it like this|Why is it like this]]
-[[Creencias|Creencias]]
-[[Sound|Sound]]
-[[Kintsugi|Kintsugi]]
-[[Ganas|Ganas]]
-[[Este chico|Este chico]]
-[[Magnifico|Magnifico]]
-[[No estoy a la altura|No estoy a la altura]]
-[[Scars|Scars]]
-[[Body|Body]]
-[[My big dream|My big dream]]
-[[Delirios en la ducha|Delirios en la ducha]]
-[[Pastis|Pastis]]
-[[Basura|Basura]]
-[[Escenarios|Escenarios]]
-[[Eli x2|Eli x2]]
-[[Delgado|Delgado]]
-[[Porro|Porro]]
-[[Me ha dado miedo|Me ha dado miedo]]
-[[Repito|Repito]]
-[[No es justo|No es justo]]
-[[In the neck|In the neck]]
-[[Indicaciones|Indicaciones]]
-[[Alcohol|Alcohol]]
-[[Sombras|Sombras]]
-[[Aphantasia|Aphantasia]]
-[[¿Para que|¿Para que]]
-[[Duele|Duele]]
-[[Envejecer|Envejecer]]
-[[Same thing|Same thing]]
-[[Abuelo|Abuelo]]
-[[No entiendo|No entiendo]]
-[[Terapeuta virtual|Terapeuta virtual]]
-[[Perdido|Perdido]]
-[[Alone|Alone]]
-[[El lastimado|El lastimado]]
-[[Mi cerebro|Mi cerebro]]
-[[Afilado|Afilado]]
-[[Me volvieron a dejar|Me volvieron a dejar]]
-[[Random vent|Random vent]]
-[[Llanto|Llanto]]
-[[Vacio|Vacio]]
-[[SHP.com|SHP.com]]
-[[Casi lo hago|Casi lo hago]]
-[[Cronico|Cronico]]
-[[En que piensas|En que piensas]]
-[[Todo|Todo]]
-[[Disposable|Disposable]]
-[[Calladito|Calladito]]
-[[Todo mal|Todo mal]]
-[[Borroso|Borroso]]
-[[Waking up or falling down|Waking up or falling down]]
-[[Escapulas|Escapulas]]
-[[En la sien|En la sien]]
-[[3 en ralla|3 en ralla]]
-[[Tik tok curse|Tik tok curse]]
-[[Creo que tengo tlp|Creo que tengo tlp]]
-[[Mala hija|Mala hija]]
-[[Padres|Padres]]
-[[Las veces que he despertado|Las veces que he despertado]]
-[[Slit|Slit]]
-[[Irrealidad|Irrealidad]]
-[[Redentor en ruinas|Redentor en ruinas]]
-[[Mi deseo|Mi deseo]]
-[[TEA|TEA]]
-[[Seen|Seen]]
-[[Sex|Sex]]
-</script>
-<script src="./assets/poem-index.js"></script>
-<script>
-  (function () {
-    if (typeof initPoemIndex !== 'function') {
-      return;
-    }
-
-    var fallbackSource = document.getElementById('poem-index-markdown');
-    var fallbackMarkdown = null;
-    if (fallbackSource && typeof fallbackSource.textContent === 'string') {
-      fallbackMarkdown = fallbackSource.textContent.trim();
-    }
-
-    initPoemIndex({
-      listSelector: '#poem-list-root',
-      statusSelector: '#status-root',
-      hintSelector: '#hint-root',
-      indexPath: 'notes/Escritos/Canciones-poemas-escritos/index.md',
-      viewerBase: 'notes/Escritos/Canciones-poemas-escritos/viewer.html',
-      fileBase: 'notes/Escritos/Canciones-poemas-escritos',
-      limit: 24,
-      fallbackMarkdown: fallbackMarkdown,
-    });
-  })();
-</script>
