@@ -46,6 +46,11 @@
     }
   }
 
+  function ensureTrailingSlash(value) {
+    if (!value) return '';
+    return value.endsWith('/') ? value : `${value}/`;
+  }
+
   function initPoemIndex(options = {}) {
     const {
       listSelector = '#poem-list',
@@ -54,6 +59,7 @@
       indexPath = 'index.md',
       viewerBase = 'viewer.html',
       fileBase = '',
+      pathPrefix = '',
       limit = null,
       fallbackMarkdown = null,
     } = options;
@@ -80,6 +86,7 @@
     }
 
     const fileBasePath = normalizeBase(fileBase);
+    const normalizedPrefix = ensureTrailingSlash(pathPrefix);
     const limited = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : null;
     const isFileProtocol =
       typeof window !== 'undefined' &&
@@ -99,10 +106,19 @@
       setHintVisible(false);
 
       visibleItems.forEach(({ label, fileName }) => {
+        const targetFileName =
+          normalizedPrefix && fileName && !fileName.includes('/')
+            ? `${normalizedPrefix}${fileName}`
+            : fileName;
         const li = document.createElement('li');
         const link = document.createElement('a');
+<<<<<<< HEAD
+        const encoded = encodeURIComponent(targetFileName);
+        const encodedPath = encodePathSegments(targetFileName);
+=======
         const encoded = encodeURIComponent(fileName);
         const encodedPath = encodePathSegments(fileName);
+>>>>>>> main
         link.href = `${viewerBase}?file=${encoded}`;
         link.textContent = label;
         li.appendChild(link);
