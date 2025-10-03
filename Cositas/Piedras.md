@@ -1,3 +1,6 @@
+---
+{"dg-publish": true, "dg-permalink": "/cositas/piedras/", "permalink": "/cositas/piedras/", "title": "Piedras"}
+---
 
 1. Cuarzo cristalino
 

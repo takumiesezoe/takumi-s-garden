@@ -1,3 +1,7 @@
+---
+{"dg-publish": true, "dg-permalink": "/cositas/perfumes/", "permalink": "/cositas/perfumes/", "title": "Perfumes"}
+---
+
 1. velvet orchid
 2. roses musk
 3. alien hypersense
