@@ -2,8 +2,8 @@
 {"dg-publish":true,"dg-permalink":"/portfolio/","permalink":"/portfolio/","title":"Portfolio"}
 ---
 
-Este cuaderno recoge mis proyectos creativos y apuntes favoritos. Aquí queda un mapa rápido de las áreas que estoy manteniendo en
-Takumi’s Garden y en mi bóveda de Obsidian.
+Este cuaderno recoge mis proyectos creativos y apuntes favoritos. Aquí queda un mapa rápido de las áreas que mantengo en
+Takumi’s Garden y en mi bóveda de Obsidian. Cada enlace apunta a la versión publicada de la nota.
 
 ## 📝 Escritos
 - [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/index|Índice de poemas, canciones y escritos]] para navegar
