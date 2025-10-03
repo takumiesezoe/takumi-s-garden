@@ -1,6 +1,7 @@
 # Takumi's Garden
 
-Takumi's Garden is a small static site that collects poems, songs and other writings. The site is built from the contents under [`src/site`](src/site) and deployed automatically to GitHub Pages via the workflow in [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
+Takumi's Garden is a small static site that collects poems, songs and other writings. <3 
+The site is built from the contents under [`src/site`](src/site) and deployed automatically to GitHub Pages via the workflow in [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
 
 ## Repository layout
 
