@@ -1,8 +1,11 @@
 ---
-{"dg-publish":true,"dg-permalink":"/oc/tu-oc/","permalink":"/oc/tu-oc/","tags":["OC","personaje"]}
+dg-publish: true
+dg-permalink: "/oc/tu-oc/"
+permalink: "/oc/tu-oc/"
+tags:
+  - "OC"
+  - "personaje"
 ---
-
-
 # = this.nombre
 
 > [!quote] Frase

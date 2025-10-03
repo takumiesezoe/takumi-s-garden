@@ -1,7 +1,7 @@
 ---
-{"dg-publish":true,"permalink":"/escritos/dias-de-colores/indice-colorido/"}
+dg-publish: true
+permalink: "/escritos/dias-de-colores/indice-colorido/"
 ---
-
 | File                                                                                     | Semilla                     | Fecha              |
 | ---------------------------------------------------------------------------------------- | --------------------------- | ------------------ |
 | [[Escritos/Dias de colores/Blanco de nuevo comienzo 🤍\|Blanco de nuevo comienzo 🤍]] | Blanco de nuevo comienzo 🤍 | October 02, 2025   |

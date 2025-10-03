@@ -1,7 +1,7 @@
 ---
-{"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/todo-mal/"}
+dg-publish: true
+permalink: "/escritos/canciones-poemas-escritos/canciones-poemas-escritos/todo-mal/"
 ---
-
 Fecha de creación: 2025-06-16T22:04
 
 Idioma: Spanish

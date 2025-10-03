@@ -1,7 +1,10 @@
 ---
-{"dg-publish":true,"permalink":"/escritos/dias-de-colores/blanco-de-nuevo-comienzo/","tags":["semillas","color"]}
+dg-publish: true
+permalink: "/escritos/dias-de-colores/blanco-de-nuevo-comienzo/"
+tags:
+  - "semillas"
+  - "color"
 ---
-
 > [!info] 🌱 Semilla de color
 > <div style="width:100%;height:80px;background:#e8e1e3;border-radius:12px;"></div>
 
