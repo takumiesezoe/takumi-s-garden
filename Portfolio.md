@@ -1,12 +1,12 @@
 # Portfolio
 
-Este cuaderno recoge mis proyectos creativos y apuntes favoritos. Aquí queda un mapa rápido de las áreas que estoy manteniendo en
-Takumi’s Garden y en mi bóveda de Obsidian.
+Este cuaderno recoge mis proyectos creativos y apuntes favoritos. Aquí queda un mapa rápido de las áreas que mantengo en Takumi’s
+Garden y en mi bóveda de Obsidian. Cada enlace apunta a la versión publicada de la nota.
 
 ## 📝 Escritos
-- [[Escritos/Canciones-poemas-escritos/Escritos_indice_con_enlace|Índice de poemas, canciones y escritos]] para navegar todos
-  los textos publicados.
-- La carpeta [[src/site/notes/Escritos/Dias de colores/index|Días de colores]] reúne las semillas cromáticas más recientes.
+- [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/index|Índice de poemas, canciones y escritos]] para navegar
+  todos los textos publicados.
+- [[Escritos/Dias de colores/index|Días de colores]] reúne las semillas cromáticas más recientes.
 
 ## 📦 Cositas
 - [[Cositas/Colecciones|Colecciones]] que voy ampliando con peluches, vinilos y otras piezas que me alegran el día.

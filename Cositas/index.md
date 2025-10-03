@@ -1,7 +1,7 @@
+
 ---
 {"dg-publish": true, "dg-permalink": "/cositas/", "permalink": "/cositas/", "title": "Cositas"}
 ---
-
 Esta carpeta reúne pequeñas listas y colecciones que quiero seguir ampliando.
 
 - [[Cositas/Colecciones|Colecciones]] de objetos que voy juntando.
