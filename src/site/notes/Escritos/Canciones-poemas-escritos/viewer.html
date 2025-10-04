@@ -637,3 +637,13 @@
     </script>
   </body>
 </html>
+(function () {
+  // usa el índice real de la carpeta
+  const INDEX_PATH = encodePathSegments('Canciones poemas escritos/index.md');
+  // (deja tu expresión de enlaces como la tenías)
+  const LINK_RE = /\[\[([^\]]+)#?([^|\]]+)?(?:\|([^\]]+))?\]\]/g;
+  // prefijo de ruta para cargar los poemas
+  const DEFAULT_PATH_PREFIX = 'Escritos/Canciones-poemas-escritos/';
+
+  // ...resto del script igual...
+})();
