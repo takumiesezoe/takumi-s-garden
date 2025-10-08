@@ -649,14 +649,49 @@
         function resolveFetchPath(path) {
           if (!path) return null;
 
-          const encodedPath = encodePathSegments(path);
-          if (path.startsWith('Escritos/')) {
-            return `../../${encodedPath}`;
+
+          const normalized = path.startsWith('notes/')
+            ? path.slice('notes/'.length)
+            : path;
+          const encodedPath = encodePathSegments(normalized);
+          const basePath = getNotesBasePath();
+
+          if (basePath) {
+            return `${basePath}${encodedPath}`;
           }
-          if (path.startsWith('Portfolio/')) {
-            return `../../${encodedPath}`;
-          }
+
           return encodedPath;
+        }
+
+        function getNotesBasePath() {
+          if (typeof window === 'undefined' || !window.location) {
+            return '';
+          }
+
+          const marker = '/notes/';
+          const { pathname } = window.location;
+          const notesIndex = pathname.indexOf(marker);
+
+          if (notesIndex !== -1) {
+            return ensureTrailingSlash(pathname.slice(0, notesIndex + marker.length));
+          }
+
+          const baseEl = document.querySelector('base');
+
+          if (baseEl && baseEl.getAttribute('href')) {
+            try {
+              const baseUrl = new URL(baseEl.getAttribute('href'), window.location.href);
+              const basePath = ensureTrailingSlash(baseUrl.pathname || '');
+              if (basePath.includes(marker)) {
+                return basePath.slice(0, basePath.indexOf(marker) + marker.length);
+              }
+              return basePath;
+            } catch (error) {
+              console.warn('No se pudo interpretar la etiqueta <base>:', error);
+            }
+          }
+
+
         }
 
         function encodePathSegments(path) {
@@ -664,6 +699,11 @@
             .split('/')
             .map((segment) => encodeURIComponent(segment))
             .join('/');
+        }
+
+        function ensureTrailingSlash(value) {
+          if (!value) return '';
+          return value.endsWith('/') ? value : `${value}/`;
 
         }
 
