@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/scars/"}
 ---
 
+
 My scars are fading like the falling leaves in autumn
 
 My mind is crawling , mind crawling into the void

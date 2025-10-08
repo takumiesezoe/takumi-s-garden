@@ -2,11 +2,9 @@
 {"dg-publish":true,"dg-permalink":"/Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/","permalink":"/Escritos/Canciones-poemas-escritos/Canciones-poemas-escritos/","title":"Canciones, poemas y escritos"}
 ---
 
-[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Amantes\|Amantes]]
-[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Brazos\|Brazos]]
-[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Recuerdos\|Recuerdos]]
-[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Me pica\|Me pica]]
+[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Pereza\|Pereza]]
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/I want it to hurt\|I want it to hurt]]
+[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Me pica\|Me pica]]
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Amigos\|Amigos]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/A nadie, nunca\|A nadie, nunca]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Miradas\|Miradas]]  
@@ -66,7 +64,7 @@
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Todo\|Todo]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Disposable\|Disposable]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Calladito\|Calladito]]  
-[[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Todo mal\|Todo mal]]  
+[[Todo mal\|Todo mal]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Borroso\|Borroso]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Waking up or falling down\|Waking up or falling down]]  
 [[Escritos/Canciones-poemas-escritos/Canciones poemas escritos/Escapulas\|Escapulas]]  

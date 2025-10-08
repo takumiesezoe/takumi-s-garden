@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/borroso/"}
 ---
 
+
 My memories are blurry,  
 I don't know what went wrong.  
 My mind is so unclear,  

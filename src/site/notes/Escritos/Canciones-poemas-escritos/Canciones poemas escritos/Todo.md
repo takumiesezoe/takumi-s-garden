@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/todo/"}
 ---
 
+
 Quiero cortarme ahogarme colgarme vaciarme
 
 sentir que al fin algo dentro de mí se calme.  

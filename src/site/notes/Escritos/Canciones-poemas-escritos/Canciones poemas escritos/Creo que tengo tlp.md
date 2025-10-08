@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/creo-que-tengo-tlp/"}
 ---
 
+
 A veces se me viene encima el mundo,  
 me traga un pozo negro y vagabundo,  
 no hay luz ni calma, solo espinas,  

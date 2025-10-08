@@ -1,7 +1,6 @@
 ---
-{"dg-publish": true, "dg-permalink": "/cositas/generos-musicales/", "permalink": "/cositas/generos-musicales/", "title": "Géneros musicales"}
+{"dg-publish":true,"dg-permalink":"/cositas/generos-musicales/","permalink":"/cositas/generos-musicales/","title":"Géneros musicales"}
 ---
-
 
 
 1. 🩸 Metal y derivados

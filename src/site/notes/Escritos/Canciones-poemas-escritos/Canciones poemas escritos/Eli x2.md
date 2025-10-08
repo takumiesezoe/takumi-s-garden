@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/eli-x2/"}
 ---
 
+
 Me gustabas, Elías  
 Me gustaba tu forma de hablarme,tu sonrisa,tu manera de ser.  
 Y fui estúpida,dejándote ir por alguien más,poniéndote como segundo plato.  

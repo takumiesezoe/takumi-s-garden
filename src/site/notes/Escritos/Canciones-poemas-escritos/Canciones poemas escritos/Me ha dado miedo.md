@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/me-ha-dado-miedo/"}
 ---
 
+
 La música a tope,  
 un fuerte portazo escuché desde la bañera.  
 Un grito borroso que decía: hija.  

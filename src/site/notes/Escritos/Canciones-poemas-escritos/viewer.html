@@ -634,10 +634,12 @@
           } catch (error) {
             return '';
           }
+
           decoded = decoded.replace(/^\/+/, '');
           if (decoded.startsWith('notes/')) {
             decoded = decoded.slice('notes/'.length);
           }
+
           if (decoded.includes('..')) {
             return '';
           }
@@ -646,6 +648,7 @@
 
         function resolveFetchPath(path) {
           if (!path) return null;
+
 
           const normalized = path.startsWith('notes/')
             ? path.slice('notes/'.length)
@@ -688,7 +691,7 @@
             }
           }
 
-          return ensureTrailingSlash(pathname.replace(/[^/]*$/, ''));
+
         }
 
         function encodePathSegments(path) {
@@ -701,6 +704,7 @@
         function ensureTrailingSlash(value) {
           if (!value) return '';
           return value.endsWith('/') ? value : `${value}/`;
+
         }
 
         function updateTitleFromPath(path) {

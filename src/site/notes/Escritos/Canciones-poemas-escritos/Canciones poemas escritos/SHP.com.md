@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/shp-com/"}
 ---
 
+
 I take refuge in the images,  
 scars that aren’t mine,  
 but they bleed like they're my own  

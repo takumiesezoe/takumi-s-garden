@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/duele/"}
 ---
 
+
 Es egoísta…  
 pero duele.
 
