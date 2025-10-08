@@ -655,6 +655,7 @@
           const encodedPath = encodePathSegments(normalized);
           const baseUrl = getNotesBaseUrl();
 
+
           if (baseUrl) {
             try {
               return new URL(encodedPath, baseUrl).toString();
@@ -685,6 +686,7 @@
           }
 
           return ensureLeadingSlash(encodedPath);
+
         }
 
         function getNotesBaseUrl() {
@@ -734,6 +736,11 @@
         function ensureTrailingSlash(value) {
           if (!value) return '';
           return value.endsWith('/') ? value : `${value}/`;
+        }
+
+        function ensureLeadingSlash(value) {
+          if (!value) return '';
+          return value.startsWith('/') ? value : `/${value}`;
         }
 
         function ensureLeadingSlash(value) {
