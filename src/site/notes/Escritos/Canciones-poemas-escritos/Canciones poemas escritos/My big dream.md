@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/my-big-dream/"}
 ---
 
+
 My dream is to be rich and be succesful I know they don't have both to complementI just wanna help others and probably myselfEven thought I probably hate myself  
 My dream is to be someone important That’s just because of my egoBut in reality I wanna travel and help around the worldGiving food water medecines and love  
 Yes love , I'm talking of lovewanna be rich but be happy and make people happyAnd in this happiness I wich I could find loveYes love , I’m talking about love  

@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/cronico/"}
 ---
 
+
 Mi padre cree que soy crónico.  
 No me comunico con ellos.  
 Tienen miedo de mí.

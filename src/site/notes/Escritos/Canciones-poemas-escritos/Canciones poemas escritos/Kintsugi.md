@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/kintsugi/"}
 ---
 
+
 Quiero tener cicatrices  
 Porque veo belleza en lo roto y reconstruido,
 

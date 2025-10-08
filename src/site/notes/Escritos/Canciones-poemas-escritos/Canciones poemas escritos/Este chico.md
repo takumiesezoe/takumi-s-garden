@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/este-chico/"}
 ---
 
+
 Te enfadaras conmigo si te digo la verdad
 
 Y lo cierto es que entre nosotros no hay ninguna oportunidad

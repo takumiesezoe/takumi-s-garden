@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/disposable/"}
 ---
 
+
 I am disposable  
 I could be trown on the bin  
 Everyone knew I wasn't able  

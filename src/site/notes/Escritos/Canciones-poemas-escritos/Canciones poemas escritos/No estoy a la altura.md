@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/no-estoy-a-la-altura/"}
 ---
 
+
 No estoy a la altura,
 
 me pesa lo difícil,

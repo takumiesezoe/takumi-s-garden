@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/escapulas/"}
 ---
 
+
 Hace tiempo quiero estar vacío por dentro
 
 Sentir hambre, estómago plano

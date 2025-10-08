@@ -634,10 +634,12 @@
           } catch (error) {
             return '';
           }
+
           decoded = decoded.replace(/^\/+/, '');
           if (decoded.startsWith('notes/')) {
             decoded = decoded.slice('notes/'.length);
           }
+
           if (decoded.includes('..')) {
             return '';
           }
@@ -646,6 +648,7 @@
 
         function resolveFetchPath(path) {
           if (!path) return null;
+
           const encodedPath = encodePathSegments(path);
           if (path.startsWith('Escritos/')) {
             return `../../${encodedPath}`;
@@ -661,6 +664,7 @@
             .split('/')
             .map((segment) => encodeURIComponent(segment))
             .join('/');
+
         }
 
         function updateTitleFromPath(path) {

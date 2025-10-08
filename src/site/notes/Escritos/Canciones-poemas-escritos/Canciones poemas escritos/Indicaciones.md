@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/indicaciones/"}
 ---
 
+
 No sé qué hacer,  
 me pierdo en mi propio silencio.  
 Necesito que me dirijan  

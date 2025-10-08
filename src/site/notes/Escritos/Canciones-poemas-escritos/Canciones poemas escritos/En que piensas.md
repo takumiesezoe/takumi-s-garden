@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/en-que-piensas/"}
 ---
 
+
 Me preguntan: ¿en qué piensas?  
 Miro a la nada, miro al todo,  
 y respondo, casi en susurro:  

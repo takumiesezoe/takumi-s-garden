@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/porro/"}
 ---
 
+
 Me he emporrado.  
 No sé si ha dado miedo o si, de alguna manera, me ha gustado.  
 Ha sido como hacer un intento constante , la misma sensación de despertar tras la inconsciencia y rozar la muerte.  

@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/tik-tok-curse/"}
 ---
 
+
 Everything is pointing at me  
 Stop staring, let me be  
 No one will ever love you — not even me  
