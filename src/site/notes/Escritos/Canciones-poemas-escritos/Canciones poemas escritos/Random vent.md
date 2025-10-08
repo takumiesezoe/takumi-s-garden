@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/random-vent/"}
 ---
 
+
 Aquí el tiempo se distorsiona  
 Allá se mueve sin que te des cuenta  
 Aquí, el caos reina  

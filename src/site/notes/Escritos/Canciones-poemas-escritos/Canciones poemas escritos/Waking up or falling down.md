@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/waking-up-or-falling-down/"}
 ---
 
+
 [Intro – Soft](Whispering in the background) Today I asked ChatGPT if one can survive A deep cut to the neck.(Soft atmosphere, gentle guitar, melancholic voice) If this is a dream, why does it hurt so much? Why does the light fade when I try to get up? Maybe it's just a nightmare I have to face, And when I wake up, will I still see your face?  
 [Verse 1 – Soft](Clean guitar, soft bass) I watch the time slip through my hands, The grey surrounds me, fear expands. Is this abyss my fault alone? Or just my mind breaking down on its own?  
 [Pre-Chorus – Building Up] (Repeated)(Rhythm starts to rise, guitars becoming more present) It’s not enough! I am nothing, that I know, Yet here I stand, lost in the flow. I drown myself in empty space, Why do I crawl? Why do I stay?  

@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/el-lastimado/"}
 ---
 
+
 Recuerdos de una infancia frente al televisor,  
 viendo cómo los dibujos de heridos captaban su atención.  
 Quería ser como ellos, estar lastimado,  

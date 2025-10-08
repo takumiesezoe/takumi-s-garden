@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/irrealidad/"}
 ---
 
+
 Estoy en un limbo de irrealidad,
 
 donde el tiempo se quiebra sin voluntad.

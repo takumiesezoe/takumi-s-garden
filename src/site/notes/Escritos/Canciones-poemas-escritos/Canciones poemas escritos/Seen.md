@@ -2,15 +2,12 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/seen/"}
 ---
 
+
 Why are they watching me  
 I don’t have to be seen  
 I’m scared even if I know it’s not a bad dream
 
 they don’t come from me
-
-  
-
-  
 
 It’s not how it seems
 

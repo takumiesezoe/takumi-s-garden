@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/terapeuta-virtual/"}
 ---
 
+
 Ahogando mis penas en inteligencia artificial,
 
 es como tener un psicólogo virtual.

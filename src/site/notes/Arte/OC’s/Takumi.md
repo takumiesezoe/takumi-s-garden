@@ -3,13 +3,14 @@
 ---
 
 
+
 # = this.nombre
 
 > [!quote] Frase
 > = this.frase
 
 ## 📸 Referencia
-![Pasted image 20251001211203.png](/img/user/Pasted%20image%2020251001211203.png)]]
+![20251002_0823_Digital Portrait Artwork_remix_01k6hsbzaafyqb06cnhw3n52n3.png](/img/user/20251002_0823_Digital%20Portrait%20Artwork_remix_01k6hsbzaafyqb06cnhw3n52n3.png)
 
 ## 🎨 Color
 #a37cda

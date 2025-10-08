@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/hospital/"}
 ---
 
+
 Quiero ir al hospital,
 
 lo pienso cada día.

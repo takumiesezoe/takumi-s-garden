@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/vacio/"}
 ---
 
+
 Nada en la vida me llena,  
 me siento vacío,  
 un cascarón con forma humana,  

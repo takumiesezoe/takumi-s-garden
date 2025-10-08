@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/en-la-sien/"}
 ---
 
+
 No sabes tú las ganas de degollarme cual gallina
 
 frente a la psiquiatra, que la pille sorprendida.

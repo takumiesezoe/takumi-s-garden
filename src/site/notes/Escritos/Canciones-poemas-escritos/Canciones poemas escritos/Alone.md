@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/alone/"}
 ---
 
+
 Alone, just me and my selfishness  
 Alone, feeling this emptiness  
 Cursed by thoughts I can't confess,  

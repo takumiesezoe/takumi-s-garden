@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/redentor-en-ruinas/"}
 ---
 
+
 Quiero salvar el mundo de su propia condena,
 
 aunque arda en llamas por mi propia pena.

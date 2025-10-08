@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/escribo/"}
 ---
 
+
 Escribo , sin motivo alguno. 
 Pienso que me desahogo. 
 Me miento a mí mismo.

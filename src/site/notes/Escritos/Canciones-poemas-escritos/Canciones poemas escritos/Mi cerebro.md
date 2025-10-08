@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/mi-cerebro/"}
 ---
 
+
 Mi cerebro está roto  
 No percibe bien las cosas,  
 no transmite bien las voces.  

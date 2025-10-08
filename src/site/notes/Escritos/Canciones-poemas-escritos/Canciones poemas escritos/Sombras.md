@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/sombras/"}
 ---
 
+
 Veo sombras  
 acechando en las esquinas,  
 rozando el borde de mis ojos,  

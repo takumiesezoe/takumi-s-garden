@@ -1,5 +1,5 @@
 ---
-{"dg-publish": true, "dg-permalink": "/cositas/piedras/", "permalink": "/cositas/piedras/", "title": "Piedras"}
+{"dg-publish":true,"dg-permalink":"/cositas/piedras/","permalink":"/cositas/piedras/","title":"Piedras"}
 ---
 
 

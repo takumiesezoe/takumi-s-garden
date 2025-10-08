@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/pastis/"}
 ---
 
+
 medicación, medicación, y mas medicación
 
 Estoy harto de que me enlaten una adicción

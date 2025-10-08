@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/aphantasia/"}
 ---
 
+
 In my mind there are no pictures,
 
 no faces waiting for me

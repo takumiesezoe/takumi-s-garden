@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/tea/"}
 ---
 
+
 pPasa que llevo tanto tiempo haciendo masking , que ya no sé quien soy en realidad
 
 Me es imposible actuar con naturalidad, sometimes I think I've been faking

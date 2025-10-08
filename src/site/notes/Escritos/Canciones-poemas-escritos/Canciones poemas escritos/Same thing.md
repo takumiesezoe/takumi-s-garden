@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/same-thing/"}
 ---
 
+
 There is a lack of purpose in my life
 
 Seems I am the most useless alive

@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/no-es-justo/"}
 ---
 
+
 No es justo para mi madre,  
 que lo haga todo sola;  
 si me voy,  

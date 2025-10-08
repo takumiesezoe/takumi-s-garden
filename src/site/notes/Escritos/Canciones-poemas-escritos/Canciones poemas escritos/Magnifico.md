@@ -2,6 +2,7 @@
 {"dg-publish":true,"permalink":"/escritos/canciones-poemas-escritos/canciones-poemas-escritos/magnifico/"}
 ---
 
+
 talvez magnifico la gravedad de las cosas
 
 Magnifico el dolor
