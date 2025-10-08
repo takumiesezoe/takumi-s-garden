@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="es" data-theme="nocturne" data-columns="single" data-typeface="sans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visor inmersivo · Canciones, poemas y escritos</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Figtree:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg-main: #05010a;
+        --bg-gradient-1: rgba(255, 95, 162, 0.18);
+        --bg-gradient-2: rgba(131, 37, 255, 0.12);
+        --bg-gradient-3: rgba(13, 222, 255, 0.08);
+        --panel-color: rgba(20, 6, 35, 0.88);
+        --panel-border: rgba(255, 95, 162, 0.35);
+        --shadow-color: rgba(10, 2, 20, 0.75);
+        --text-color: #fce6f6;
+        --text-muted: #d6a9c5;
+        --text-soft: rgba(246, 204, 224, 0.85);
+        --accent: #ff5fa2;
+        --accent-strong: #ff82c0;
+        --control-bg: rgba(18, 6, 29, 0.6);
+        --control-border: rgba(255, 95, 162, 0.35);
+        --reader-font-scale: 1;
+        --reader-line-height: 1.8;
+        --reader-max-width: min(70ch, calc(100vw - 3rem));
+        --reader-font-family-sans: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --reader-font-family-serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+      }
+
+      html[data-theme='dawn'] {
+        color-scheme: light;
+        --bg-main: #fdf7ff;
+        --bg-gradient-1: rgba(255, 165, 210, 0.38);
+        --bg-gradient-2: rgba(165, 196, 255, 0.28);
+        --bg-gradient-3: rgba(255, 221, 130, 0.22);
+        --panel-color: rgba(255, 255, 255, 0.82);
+        --panel-border: rgba(206, 132, 196, 0.35);
+        --shadow-color: rgba(204, 172, 190, 0.45);
+        --text-color: #3b1d36;
+        --text-muted: #715a70;
+        --text-soft: rgba(61, 40, 58, 0.7);
+        --accent: #cf3f7a;
+        --accent-strong: #e45994;
+        --control-bg: rgba(255, 255, 255, 0.75);
+        --control-border: rgba(203, 137, 184, 0.38);
+      }
+
+      html[data-columns='double'] {
+        --reader-max-width: min(118ch, calc(100vw - 3.5rem));
+      }
+
+      @media (max-width: 960px) {
+        html[data-columns='double'] {
+          --reader-max-width: min(70ch, calc(100vw - 3rem));
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg-main);
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow-x: hidden;
+        transition: background 0.6s ease, color 0.6s ease;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::before {
+        background: radial-gradient(circle at 12% 18%, var(--bg-gradient-1), transparent 55%),
+          radial-gradient(circle at 82% 12%, var(--bg-gradient-2), transparent 62%),
+          radial-gradient(circle at 75% 78%, var(--bg-gradient-3), transparent 68%),
+          var(--bg-main);
+        opacity: 0.95;
+      }
+
+      body::after {
+        background: linear-gradient(180deg, rgba(6, 2, 12, 0.35), transparent 22%, transparent 82%, rgba(8, 2, 12, 0.55));
+      }
+
+      body > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      header.viewer-header {
+        padding: 2.75rem 1.5rem 1.25rem;
+        text-align: center;
+        max-width: 78rem;
+        margin: 0 auto;
+      }
+
+      header.viewer-header .breadcrumbs {
+        margin: 0 0 1rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      header.viewer-header h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(2rem, 5vw, 3.25rem);
+        color: var(--accent-strong);
+        text-shadow: 0 18px 45px var(--shadow-color);
+      }
+
+      header.viewer-header p.meta,
+      header.viewer-header p.hint {
+        margin: 0.5rem auto 0;
+        max-width: 44rem;
+        color: var(--text-muted);
+      }
+
+      header.viewer-header p.hint {
+        font-size: 0.9rem;
+      }
+
+      header.viewer-header p.hint kbd {
+        display: inline-block;
+        padding: 0.15rem 0.45rem;
+        border-radius: 0.45rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.15);
+        font-size: 0.8rem;
+        font-family: inherit;
+        margin: 0 0.15rem;
+        color: inherit;
+      }
+
+      html[data-theme='dawn'] header.viewer-header p.hint kbd {
+        border-color: rgba(45, 20, 35, 0.25);
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      #status-root {
+        margin-top: 1.25rem;
+        color: var(--text-muted);
+        transition: color 0.4s ease;
+      }
+
+      #status-root[data-state='error'] {
+        color: var(--accent-strong);
+      }
+
+      #status-root[data-state='success'] {
+        color: var(--text-soft);
+      }
+
+      .control-tray {
+        margin: 2rem auto 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        background: var(--control-bg);
+        border-radius: 999px;
+        border: 1px solid var(--control-border);
+        box-shadow: 0 22px 50px var(--shadow-color);
+        backdrop-filter: blur(18px);
+        width: fit-content;
+        max-width: min(58rem, calc(100% - 1.5rem));
+      }
+
+      .control-tray .control {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-color);
+        font: inherit;
+        font-size: 0.95rem;
+        line-height: 1;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+      }
+
+      .control-tray .control .label {
+        white-space: nowrap;
+      }
+
+      .control-tray .control .emoji {
+        font-size: 1.1rem;
+      }
+
+      .control-tray .control:hover,
+      .control-tray .control:focus-visible {
+        border-color: var(--accent);
+        color: var(--accent-strong);
+        outline: none;
+        transform: translateY(-1px);
+      }
+
+      .control-tray .control[aria-pressed='true'] {
+        border-color: var(--accent);
+        background: rgba(255, 95, 162, 0.18);
+        color: var(--accent-strong);
+      }
+
+      .control-tray .control[disabled],
+      .control-tray .control[aria-disabled='true'],
+      .control-tray .control.is-disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .control-tray .control.control--link {
+        padding: 0.55rem 1.05rem;
+      }
+
+      progress#reading-progress {
+        display: block;
+        width: min(48rem, calc(100% - 3rem));
+        margin: 1.85rem auto 0;
+        height: 0.5rem;
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+
+      progress#reading-progress::-webkit-progress-bar {
+        background-color: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+      }
+
+      progress#reading-progress::-webkit-progress-value {
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+        border-radius: 999px;
+      }
+
+      progress#reading-progress::-moz-progress-bar {
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+        border-radius: 999px;
+      }
+
+      main.viewer-main {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        padding: 1rem 1.5rem 4rem;
+      }
+
+      article.poem-shell {
+        width: var(--reader-max-width);
+        margin: 0 auto;
+        padding: clamp(1.65rem, 4vw, 3rem);
+        border-radius: 2.15rem;
+        border: 1px solid var(--panel-border);
+        background: var(--panel-color);
+        box-shadow: 0 35px 70px var(--shadow-color);
+        backdrop-filter: blur(24px);
+        transition: transform 0.45s ease, opacity 0.45s ease;
+      }
+
+      body:not(.is-loaded) article.poem-shell {
+        opacity: 0.4;
+        transform: translateY(18px);
+      }
+
+      article.poem-shell[data-state='error'] {
+        opacity: 1;
+        transform: none;
+        border-style: dashed;
+      }
+
+      #poem-content {
+        font-family: var(--reader-font-family-sans);
+        font-size: calc(1rem * var(--reader-font-scale));
+        line-height: var(--reader-line-height);
+        column-count: 1;
+        column-gap: 3rem;
+      }
+
+      html[data-typeface='serif'] #poem-content {
+        font-family: var(--reader-font-family-serif);
+        letter-spacing: 0.01em;
+      }
+
+      html[data-columns='double'] #poem-content {
+        column-count: 2;
+      }
+
+      @media (max-width: 960px) {
+        html[data-columns='double'] #poem-content {
+          column-count: 1;
+        }
+      }
+
+      #poem-content > * {
+        break-inside: avoid;
+      }
+
+      #poem-content h1,
+      #poem-content h2,
+      #poem-content h3,
+      #poem-content h4,
+      #poem-content h5,
+      #poem-content h6 {
+        color: var(--accent);
+        margin: 1.5em 0 0.6em;
+        line-height: 1.25;
+      }
+
+      #poem-content h1:first-child,
+      #poem-content h2:first-child,
+      #poem-content h3:first-child {
+        margin-top: 0;
+      }
+
+      #poem-content p {
+        margin: 0 0 1.55em;
+      }
+
+      #poem-content p:last-child {
+        margin-bottom: 0;
+      }
+
+      #poem-content strong {
+        color: var(--accent-strong);
+        font-weight: 600;
+      }
+
+      #poem-content em {
+        color: var(--text-soft);
+      }
+
+      #poem-content a {
+        color: var(--accent);
+      }
+
+      #poem-content ul,
+      #poem-content ol {
+        margin: 0 0 1.55em 1.2em;
+        padding: 0;
+      }
+
+      #poem-content li {
+        margin-bottom: 0.5em;
+      }
+
+      #poem-content blockquote {
+        margin: 1.75em 0;
+        padding-left: 1.35em;
+        border-left: 3px solid rgba(255, 95, 162, 0.35);
+        color: var(--text-soft);
+        font-style: italic;
+      }
+
+      #poem-content hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 95, 162, 0.45), transparent);
+        margin: 2.5em 0;
+      }
+
+      #poem-content code {
+        font-family: "JetBrains Mono", "SFMono-Regular", SFMono-Regular, ui-monospace, "Fira Code", "Courier New", monospace;
+        background: rgba(255, 95, 162, 0.16);
+        padding: 0.15rem 0.4rem;
+        border-radius: 0.5rem;
+      }
+
+      #poem-content pre {
+        margin: 2em 0;
+        padding: 1.25rem 1.35rem;
+        border-radius: 1.35rem;
+        background: rgba(255, 95, 162, 0.14);
+        overflow-x: auto;
+      }
+
+      #poem-content pre code {
+        background: transparent;
+        padding: 0;
+      }
+
+      #poem-content img,
+      #poem-content video,
+      #poem-content iframe {
+        max-width: 100%;
+        border-radius: 1rem;
+        margin: 1.75em 0;
+        box-shadow: 0 25px 55px rgba(10, 2, 20, 0.6);
+      }
+
+      #poem-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2em 0;
+        font-size: 0.95em;
+      }
+
+      #poem-content table th,
+      #poem-content table td {
+        border: 1px solid rgba(255, 95, 162, 0.25);
+        padding: 0.75rem 0.9rem;
+      }
+
+      footer.viewer-footer {
+        text-align: center;
+        padding: 0 1.5rem 3rem;
+        color: var(--text-muted);
+      }
+
+      footer.viewer-footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      footer.viewer-footer a:hover,
+      footer.viewer-footer a:focus-visible {
+        text-decoration: underline;
+      }
+
+      noscript {
+        text-align: center;
+        padding: 0 1.5rem 3rem;
+        color: var(--accent-strong);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body,
+        body::before,
+        article.poem-shell,
+        .control-tray .control {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="viewer-header">
+      <p class="breadcrumbs">Notas · Canciones, poemas y escritos</p>
+      <h1 id="poem-title">Visor inmersivo</h1>
+      <p class="meta" id="status-root" role="status" data-state="info">
+        Selecciona un poema desde el índice para cargarlo aquí.
+      </p>
+      <div class="control-tray" aria-label="Controles de lectura">
+        <button type="button" class="control" data-action="size-down" aria-label="Reducir tamaño de texto">
+          <span aria-hidden="true">A−</span>
+        </button>
+        <button type="button" class="control" data-action="size-up" aria-label="Aumentar tamaño de texto">
+          <span aria-hidden="true">A+</span>
+        </button>
+        <button type="button" class="control" data-action="typeface" aria-pressed="false">
+          <span class="emoji" aria-hidden="true">𝑨</span>
+          <span class="label">Tipografía serif</span>
+        </button>
+        <button type="button" class="control" data-action="columns" aria-pressed="false">
+          <span class="emoji" aria-hidden="true">⫿</span>
+          <span class="label">Dos columnas</span>
+        </button>
+        <button type="button" class="control" data-action="theme" aria-pressed="false">
+          <span class="emoji" aria-hidden="true">🌗</span>
+          <span class="label">Modo alba</span>
+        </button>
+        <button type="button" class="control" data-action="fullscreen" aria-pressed="false">
+          <span class="emoji" aria-hidden="true">⛶</span>
+          <span class="label">Pantalla completa</span>
+        </button>
+        <a class="control control--link is-disabled" id="raw-link" href="#" download aria-disabled="true">Descargar .md</a>
+        <a class="control control--link" href="index.html">Índice</a>
+        <a class="control control--link" href="../../../../index.html">Inicio</a>
+      </div>
+      <p class="hint">
+        Atajos: <kbd>+</kbd>/<kbd>=</kbd> aumenta, <kbd>-</kbd> reduce, <kbd>T</kbd> alterna modo, <kbd>C</kbd> columnas, <kbd>S</kbd>
+        tipografía, <kbd>F</kbd> pantalla completa.
+      </p>
+      <progress id="reading-progress" value="0" max="1" aria-label="Progreso de lectura"></progress>
+    </header>
+    <main class="viewer-main">
+      <article class="poem-shell" id="poem-shell" data-state="idle">
+        <div id="poem-content" class="poem-content" aria-live="polite"></div>
+      </article>
+    </main>
+    <footer class="viewer-footer">
+      <p>
+        Los textos se cargan directamente desde los archivos Markdown publicados en esta carpeta. Ajusta la lectura a tu gusto y
+        regresa al índice cuando quieras continuar explorando.
+      </p>
+    </footer>
+    <noscript>
+      <p role="alert">Activa JavaScript para mostrar el contenido del poema.</p>
+    </noscript>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      (function () {
+        if (typeof window === 'undefined') {
+          return;
+        }
+
+        const docEl = document.documentElement;
+        const bodyEl = document.body;
+        const params = new URLSearchParams(window.location.search);
+        const fileParam = params.get('file');
+        const statusEl = document.getElementById('status-root');
+        const titleEl = document.getElementById('poem-title');
+        const contentEl = document.getElementById('poem-content');
+        const rawLink = document.getElementById('raw-link');
+        const shellEl = document.getElementById('poem-shell');
+        const progressEl = document.getElementById('reading-progress');
+
+        const controls = {
+          sizeDown: document.querySelector('[data-action="size-down"]'),
+          sizeUp: document.querySelector('[data-action="size-up"]'),
+          theme: document.querySelector('[data-action="theme"]'),
+          columns: document.querySelector('[data-action="columns"]'),
+          typeface: document.querySelector('[data-action="typeface"]'),
+          fullscreen: document.querySelector('[data-action="fullscreen"]'),
+        };
+
+        const STORAGE_KEY = 'takumi-immersive-viewer:v1';
+        const SCALE_MIN = 0.85;
+        const SCALE_MAX = 1.65;
+        const SCALE_STEP = 0.1;
+
+        const defaultState = {
+          fontScale: 1,
+          theme: 'nocturne',
+          columns: 'single',
+          typeface: 'sans',
+        };
+
+        const viewerState = Object.assign({}, defaultState, loadState());
+
+        applyState();
+        updateControls();
+        disableRawLink();
+        scheduleProgressUpdate();
+        bodyEl.classList.add('is-loaded');
+
+        if (!fileParam) {
+          setStatus('Selecciona un poema desde el índice para cargarlo aquí.', 'info');
+          return;
+        }
+
+        const sanitizedPath = sanitizePath(fileParam);
+        if (!sanitizedPath) {
+          setStatus('No se pudo interpretar el archivo solicitado.', 'error');
+          return;
+        }
+
+        const fetchPath = resolveFetchPath(sanitizedPath);
+        if (!fetchPath) {
+          setStatus('Ruta del archivo inválida.', 'error');
+          return;
+        }
+
+        setStatus('Cargando poema…');
+        if (shellEl) {
+          shellEl.dataset.state = 'loading';
+        }
+        bodyEl.classList.remove('is-loaded');
+        contentEl.innerHTML = '';
+        try {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        } catch (error) {
+          window.scrollTo(0, 0);
+        }
+
+        updateTitleFromPath(sanitizedPath);
+        setRawLink(sanitizedPath, fetchPath);
+
+        fetch(fetchPath)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            return response.text();
+          })
+          .then((markdown) => {
+            const html = typeof window.marked !== 'undefined' ? window.marked.parse(markdown) : markdown;
+            contentEl.innerHTML = html;
+            setStatus('Poema cargado. Disfruta la lectura.', 'success');
+            if (shellEl) {
+              shellEl.dataset.state = 'ready';
+            }
+            bodyEl.classList.add('is-loaded');
+            scheduleProgressUpdate();
+          })
+          .catch((error) => {
+            console.error(error);
+            contentEl.innerHTML = '';
+            setStatus('No se pudo cargar el poema solicitado.', 'error');
+            disableRawLink();
+            if (shellEl) {
+              shellEl.dataset.state = 'error';
+            }
+            bodyEl.classList.add('is-loaded');
+            scheduleProgressUpdate();
+          });
+
+        setupControls();
+        setupKeyboardShortcuts();
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+        function sanitizePath(value) {
+          if (!value) return '';
+          let decoded;
+          try {
+            decoded = decodeURIComponent(value);
+          } catch (error) {
+            return '';
+          }
+          decoded = decoded.replace(/^\/+/, '');
+          if (decoded.startsWith('notes/')) {
+            decoded = decoded.slice('notes/'.length);
+          }
+          if (decoded.includes('..')) {
+            return '';
+          }
+          return decoded;
+        }
+
+        function resolveFetchPath(path) {
+          if (!path) return null;
+          const encodedPath = encodePathSegments(path);
+          if (path.startsWith('Escritos/')) {
+            return `../../${encodedPath}`;
+          }
+          if (path.startsWith('Portfolio/')) {
+            return `../../${encodedPath}`;
+          }
+          return encodedPath;
+        }
+
+        function encodePathSegments(path) {
+          return path
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/');
+        }
+
+        function updateTitleFromPath(path) {
+          if (!path) return;
+          const parts = path.split('/');
+          const fileName = parts[parts.length - 1] || '';
+          const clean = fileName.replace(/\.md$/i, '');
+          if (clean) {
+            document.title = `${clean} · Visor inmersivo`;
+            if (titleEl) {
+              titleEl.textContent = clean;
+            }
+          }
+        }
+
+        function setStatus(text, state = 'info') {
+          if (!statusEl) return;
+          statusEl.textContent = text;
+          statusEl.dataset.state = state;
+        }
+
+        function setRawLink(path, fetchPath) {
+          if (!rawLink) return;
+          if (!path || !fetchPath) {
+            disableRawLink();
+            return;
+          }
+          rawLink.classList.remove('is-disabled');
+          rawLink.removeAttribute('aria-disabled');
+          rawLink.href = fetchPath;
+          const fileName = path.split('/').pop() || 'poema.md';
+          rawLink.download = fileName;
+        }
+
+        function disableRawLink() {
+          if (!rawLink) return;
+          rawLink.classList.add('is-disabled');
+          rawLink.setAttribute('aria-disabled', 'true');
+          rawLink.removeAttribute('href');
+          rawLink.removeAttribute('download');
+        }
+
+        function applyState() {
+          docEl.dataset.theme = viewerState.theme;
+          docEl.dataset.columns = viewerState.columns;
+          docEl.dataset.typeface = viewerState.typeface;
+          docEl.style.setProperty('--reader-font-scale', viewerState.fontScale.toFixed(2));
+        }
+
+        function persistState() {
+          try {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(viewerState));
+          } catch (error) {
+            console.warn('No se pudo guardar la preferencia del visor:', error);
+          }
+        }
+
+        function loadState() {
+          try {
+            const stored = window.localStorage.getItem(STORAGE_KEY);
+            if (!stored) {
+              return {};
+            }
+            const parsed = JSON.parse(stored);
+            return typeof parsed === 'object' && parsed ? parsed : {};
+          } catch (error) {
+            return {};
+          }
+        }
+
+        function clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max);
+        }
+
+        function adjustFontScale(delta) {
+          const next = clamp(Number(viewerState.fontScale) + delta, SCALE_MIN, SCALE_MAX);
+          if (Math.abs(next - viewerState.fontScale) < 0.005) {
+            return;
+          }
+          viewerState.fontScale = parseFloat(next.toFixed(2));
+          applyState();
+          persistState();
+          updateControls();
+          scheduleProgressUpdate();
+        }
+
+        function toggleTheme() {
+          viewerState.theme = viewerState.theme === 'nocturne' ? 'dawn' : 'nocturne';
+          applyState();
+          persistState();
+          updateControls();
+        }
+
+        function toggleColumns() {
+          viewerState.columns = viewerState.columns === 'single' ? 'double' : 'single';
+          applyState();
+          persistState();
+          updateControls();
+          scheduleProgressUpdate();
+        }
+
+        function toggleTypeface() {
+          viewerState.typeface = viewerState.typeface === 'sans' ? 'serif' : 'sans';
+          applyState();
+          persistState();
+          updateControls();
+        }
+
+        function toggleFullscreen() {
+          if (!document.fullscreenElement) {
+            const target = document.documentElement;
+            if (target.requestFullscreen) {
+              const requestResult = target.requestFullscreen();
+              if (requestResult && typeof requestResult.catch === 'function') {
+                requestResult.catch(() => {});
+              }
+            }
+          } else if (document.exitFullscreen) {
+            const exitResult = document.exitFullscreen();
+            if (exitResult && typeof exitResult.catch === 'function') {
+              exitResult.catch(() => {});
+            }
+          }
+        }
+
+        function updateControls() {
+          if (controls.sizeDown) {
+            controls.sizeDown.disabled = viewerState.fontScale <= SCALE_MIN + 0.01;
+          }
+          if (controls.sizeUp) {
+            controls.sizeUp.disabled = viewerState.fontScale >= SCALE_MAX - 0.01;
+          }
+          if (controls.theme) {
+            controls.theme.setAttribute('aria-pressed', viewerState.theme === 'dawn' ? 'true' : 'false');
+            const label = controls.theme.querySelector('.label');
+            if (label) {
+              label.textContent = viewerState.theme === 'dawn' ? 'Modo nocturno' : 'Modo alba';
+            }
+            const emoji = controls.theme.querySelector('.emoji');
+            if (emoji) {
+              emoji.textContent = viewerState.theme === 'dawn' ? '🌅' : '🌗';
+            }
+          }
+          if (controls.columns) {
+            const isDouble = viewerState.columns === 'double';
+            controls.columns.setAttribute('aria-pressed', isDouble ? 'true' : 'false');
+            const label = controls.columns.querySelector('.label');
+            if (label) {
+              label.textContent = isDouble ? 'Una columna' : 'Dos columnas';
+            }
+            const emoji = controls.columns.querySelector('.emoji');
+            if (emoji) {
+              emoji.textContent = isDouble ? '▮' : '⫿';
+            }
+          }
+          if (controls.typeface) {
+            const isSerif = viewerState.typeface === 'serif';
+            controls.typeface.setAttribute('aria-pressed', isSerif ? 'true' : 'false');
+            const label = controls.typeface.querySelector('.label');
+            if (label) {
+              label.textContent = isSerif ? 'Tipografía sans' : 'Tipografía serif';
+            }
+            const emoji = controls.typeface.querySelector('.emoji');
+            if (emoji) {
+              emoji.textContent = isSerif ? 'A' : '𝑨';
+            }
+          }
+          updateFullscreenButton();
+        }
+
+        function updateFullscreenButton() {
+          if (!controls.fullscreen) return;
+          const isFullscreen = Boolean(document.fullscreenElement);
+          controls.fullscreen.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+          const label = controls.fullscreen.querySelector('.label');
+          if (label) {
+            label.textContent = isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa';
+          }
+          const emoji = controls.fullscreen.querySelector('.emoji');
+          if (emoji) {
+            emoji.textContent = isFullscreen ? '🡸' : '⛶';
+          }
+        }
+
+        function setupControls() {
+          controls.sizeDown?.addEventListener('click', () => adjustFontScale(-SCALE_STEP));
+          controls.sizeUp?.addEventListener('click', () => adjustFontScale(SCALE_STEP));
+          controls.theme?.addEventListener('click', toggleTheme);
+          controls.columns?.addEventListener('click', toggleColumns);
+          controls.typeface?.addEventListener('click', toggleTypeface);
+          controls.fullscreen?.addEventListener('click', toggleFullscreen);
+        }
+
+        function setupKeyboardShortcuts() {
+          window.addEventListener('keydown', (event) => {
+            if (event.defaultPrevented) return;
+            if (event.metaKey || event.ctrlKey || event.altKey) return;
+            switch (event.key) {
+              case '+':
+              case '=':
+                adjustFontScale(SCALE_STEP);
+                event.preventDefault();
+                break;
+              case '-':
+                adjustFontScale(-SCALE_STEP);
+                event.preventDefault();
+                break;
+              case 't':
+              case 'T':
+                toggleTheme();
+                break;
+              case 'c':
+              case 'C':
+                toggleColumns();
+                break;
+              case 's':
+              case 'S':
+                toggleTypeface();
+                break;
+              case 'f':
+              case 'F':
+                toggleFullscreen();
+                break;
+              default:
+                break;
+            }
+          });
+        }
+
+        let progressFrame = null;
+        function scheduleProgressUpdate() {
+          if (!progressEl) return;
+          if (progressFrame) {
+            return;
+          }
+          progressFrame = window.requestAnimationFrame(() => {
+            progressFrame = null;
+            updateProgress();
+          });
+        }
+
+        function updateProgress() {
+          if (!progressEl) return;
+          const scrollTop = window.scrollY || docEl.scrollTop || 0;
+          const scrollHeight = docEl.scrollHeight || 0;
+          const maxScroll = scrollHeight - window.innerHeight;
+          const ratio = maxScroll > 0 ? clamp(scrollTop / maxScroll, 0, 1) : 0;
+          progressEl.value = ratio;
+        }
+
+        window.addEventListener('scroll', scheduleProgressUpdate, { passive: true });
+        window.addEventListener('resize', scheduleProgressUpdate);
+      })();
+    </script>
+  </body>
+</html>
