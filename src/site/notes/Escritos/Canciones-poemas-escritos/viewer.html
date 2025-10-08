@@ -649,31 +649,57 @@
         function resolveFetchPath(path) {
           if (!path) return null;
 
-
           const normalized = path.startsWith('notes/')
             ? path.slice('notes/'.length)
             : path;
           const encodedPath = encodePathSegments(normalized);
-          const basePath = getNotesBasePath();
+          const baseUrl = getNotesBaseUrl();
 
-          if (basePath) {
-            return `${basePath}${encodedPath}`;
+          if (baseUrl) {
+            try {
+              return new URL(encodedPath, baseUrl).toString();
+            } catch (error) {
+              console.warn('No se pudo combinar la URL base con el archivo solicitado:', error);
+            }
           }
 
-          return encodedPath;
+          if (typeof window !== 'undefined' && window.location) {
+            const { origin, href } = window.location;
+            const hasOrigin = origin && origin !== 'null';
+
+            if (hasOrigin) {
+              const originBase = ensureTrailingSlash(origin);
+              try {
+                return new URL(encodedPath, originBase).toString();
+              } catch (error) {
+                console.warn('No se pudo construir la ruta del poema usando el origen:', error);
+                return `${origin}${ensureLeadingSlash(encodedPath)}`;
+              }
+            }
+
+            try {
+              return new URL(encodedPath, href).toString();
+            } catch (error) {
+              console.warn('No se pudo combinar la ruta del visor con el archivo solicitado:', error);
+            }
+          }
+
+          return ensureLeadingSlash(encodedPath);
         }
 
-        function getNotesBasePath() {
+        function getNotesBaseUrl() {
           if (typeof window === 'undefined' || !window.location) {
             return '';
           }
 
           const marker = '/notes/';
-          const { pathname } = window.location;
+          const { origin, pathname } = window.location;
           const notesIndex = pathname.indexOf(marker);
 
           if (notesIndex !== -1) {
-            return ensureTrailingSlash(pathname.slice(0, notesIndex + marker.length));
+            const basePath = pathname.slice(0, notesIndex + marker.length);
+            const normalized = ensureLeadingSlash(ensureTrailingSlash(basePath));
+            return `${origin}${normalized}`;
           }
 
           const baseEl = document.querySelector('base');
@@ -683,15 +709,19 @@
               const baseUrl = new URL(baseEl.getAttribute('href'), window.location.href);
               const basePath = ensureTrailingSlash(baseUrl.pathname || '');
               if (basePath.includes(marker)) {
-                return basePath.slice(0, basePath.indexOf(marker) + marker.length);
+                const normalized = ensureLeadingSlash(
+                  ensureTrailingSlash(basePath.slice(0, basePath.indexOf(marker) + marker.length))
+                );
+                return `${baseUrl.origin}${normalized}`;
               }
-              return basePath;
+              const normalized = ensureLeadingSlash(basePath);
+              return `${baseUrl.origin}${ensureTrailingSlash(normalized)}`;
             } catch (error) {
               console.warn('No se pudo interpretar la etiqueta <base>:', error);
             }
           }
 
-
+          return '';
         }
 
         function encodePathSegments(path) {
@@ -704,7 +734,11 @@
         function ensureTrailingSlash(value) {
           if (!value) return '';
           return value.endsWith('/') ? value : `${value}/`;
+        }
 
+        function ensureLeadingSlash(value) {
+          if (!value) return '';
+          return value.startsWith('/') ? value : `/${value}`;
         }
 
         function updateTitleFromPath(path) {
