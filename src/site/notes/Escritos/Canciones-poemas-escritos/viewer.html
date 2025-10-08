@@ -634,7 +634,12 @@
           } catch (error) {
             return '';
           }
-          decoded = decoded.replace(/\+/g, '/').replace(/^\/+/, '');
+
+          decoded = decoded.replace(/^\/+/, '');
+          if (decoded.startsWith('notes/')) {
+            decoded = decoded.slice('notes/'.length);
+          }
+
           if (decoded.includes('..')) {
             return '';
           }
@@ -643,13 +648,23 @@
 
         function resolveFetchPath(path) {
           if (!path) return null;
+
+          const encodedPath = encodePathSegments(path);
           if (path.startsWith('Escritos/')) {
-            return `../../${path}`;
+            return `../../${encodedPath}`;
           }
           if (path.startsWith('Portfolio/')) {
-            return `../../${path}`;
+            return `../../${encodedPath}`;
           }
-          return path;
+          return encodedPath;
+        }
+
+        function encodePathSegments(path) {
+          return path
+            .split('/')
+            .map((segment) => encodeURIComponent(segment))
+            .join('/');
+
         }
 
         function updateTitleFromPath(path) {
